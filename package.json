@@ -1,0 +1,31 @@
+{
+  "name": "squeegee-server",
+  "version": "0.1.0",
+  "description": "The server for the Squeegee Whiteboard application",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ignore-path .gitignore .",
+    "start": "node ./app.js",
+    "dev": "nodemon ./app.js"
+  },
+  "dependencies": {
+    "debug": "^4.1.1",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "nodemon": "^1.18.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/squeegee-whiteboard/server.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/squeegee-whiteboard/server/issues"
+  },
+  "homepage": "https://github.com/squeegee-whiteboard/server#readme"
+}
