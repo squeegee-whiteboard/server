@@ -11,13 +11,16 @@
   "dependencies": {
     "debug": "^4.1.1",
     "express": "^4.16.4",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "sequelize": "^5.2.12",
+    "sqlite3": "^4.0.6"
   },
   "devDependencies": {
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0",
-    "nodemon": "^1.18.10"
+    "nodemon": "^1.18.10",
+    "sequelize-cli": "^5.4.0"
   },
   "repository": {
     "type": "git",

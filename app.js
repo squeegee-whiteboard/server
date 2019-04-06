@@ -2,6 +2,7 @@ const express = require('express');
 const Debug = require('debug');
 const http = require('http');
 const morgan = require('morgan');
+const models = require('./models');
 
 const indexRouter = require('./routes/index');
 
@@ -21,8 +22,14 @@ app.set('port', port);
 // Create HTTP server.
 const server = http.createServer(app);
 
-// Listen on provided port, on all network interfaces.
-server.listen(port);
-server.on('listening', () => {
-  debug(`Listening on http://localhost:${port}`);
+
+// Sync models with the database
+models.sequelize.sync().then(() => {
+  // Listen on provided port, on all network interfaces.
+  server.listen(port);
+  server.on('listening', () => {
+    debug(`Listening on http://${server.address().address}:${server.address().port}`);
+  });
+}).catch((error) => {
+  debug(error, 'Error syncing the database!');
 });

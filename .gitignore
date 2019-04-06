@@ -1,6 +1,9 @@
 # VSCode folder
 .vscode/
 
+# Sqlite db
+*.sqlite3
+
 # Logs
 logs
 *.log
