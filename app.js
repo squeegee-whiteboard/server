@@ -33,4 +33,3 @@ models.sequelize.sync().then(() => {
 }).catch((error) => {
   debug(error, 'Error syncing the database!');
 });
-

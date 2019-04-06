@@ -1,5 +1,3 @@
-'use strict';
-
 const PASSWORD_HASH_LENGTH = 60;
 
 module.exports = (sequelize, DataTypes) => {
@@ -28,15 +26,15 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
     },
   }, {});
-  User.associate = function(models) {
+  User.associate = (models) => {
     // associations can be defined here
     User.hasMany(models.Board, {
-      as: "owned_boards",
-      foreignKey: 'owner_id'
+      as: 'owned_boards',
+      foreignKey: 'owner_id',
     });
     User.belongsToMany(models.Board, {
       as: 'boards',
-      through: "board_members",
+      through: 'board_members',
       foreignKey: 'user_id',
     });
   };

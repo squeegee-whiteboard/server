@@ -1,7 +1,3 @@
-'use strict';
-
-const PASSWORD_HASH_LENGTH = 60;
-
 module.exports = (sequelize, DataTypes) => {
   const Board = sequelize.define('Board', {
     board_name: {
@@ -16,16 +12,16 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: [],
     },
   }, {});
-  Board.associate = function(models) {
+  Board.associate = (models) => {
     // associations can be defined here
     Board.belongsTo(models.User, {
-      as: 'owner', 
+      as: 'owner',
       foreignKey: 'owner_id',
       onDelete: 'CASCADE',
-     });
+    });
     Board.belongsToMany(models.User, {
       as: 'members',
-      through: "board_members",
+      through: 'board_members',
       foreignKey: 'board_id',
     });
   };
