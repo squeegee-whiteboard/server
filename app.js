@@ -9,6 +9,8 @@ const models = require('./models');
 
 const indexRouter = require('./routes/index');
 const registerRouter = require('./routes/registerUser');
+const loginRouter = require('./routes/loginUser');
+const updateUsernameRouter = require('./routes/updateUsername');
 
 const app = express();
 const debug = Debug('server');
@@ -24,6 +26,8 @@ app.use(morgan('dev'));
 
 app.use('/', indexRouter);
 app.use('/registerUser', registerRouter);
+app.use('/loginUser', loginRouter);
+app.use('/updateUsername', updateUsernameRouter);
 
 // Get port from environment and store in Express.
 const port = process.env.PORT || '3000';

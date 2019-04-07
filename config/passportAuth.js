@@ -62,7 +62,7 @@ passport.use(
       passwordField: 'password',
       session: false,
     },
-    (username, email, password, done) => {
+    (email, password, done) => {
       try {
         User.findOne({
           where: {
@@ -99,14 +99,15 @@ passport.use(
   'jwt',
   new JWTstrategy(opts, (jwtPayload, done) => {
     try {
+      debug(jwtPayload.id);
       User.findOne({
         where: {
-          username: jwtPayload.id,
+          id: jwtPayload.id,
         },
       }).then((foundUser) => {
         if (foundUser) {
-          debug('User with found in database in passport');
-          // note the return removed with passport JWT - add this return for passport local
+          debug(`User with email ${foundUser.email} found in database in passport`);
+          // note the return is removed with passport JWT - add this return for passport local
           done(null, foundUser);
         } else {
           debug('User not found in database');
