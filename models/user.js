@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       notEmpty: true,
       allowNull: false,
+      defaultValue: 'NewUser',
     },
     email: {
       type: DataTypes.STRING,
@@ -16,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         isEmail: true,
       },
     },
-    password_hash: {
+    password: {
       type: DataTypes.STRING(PASSWORD_HASH_LENGTH),
       allowNull: false,
     },

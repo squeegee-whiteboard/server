@@ -1,19 +1,29 @@
 const express = require('express');
+const Cors = require('cors');
 const Debug = require('debug');
 const http = require('http');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const passport = require('passport');
 const models = require('./models');
 
 const indexRouter = require('./routes/index');
+const registerRouter = require('./routes/registerUser');
 
 const app = express();
 const debug = Debug('server');
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Configure middleware
+require('./config/passportAuth');
+
+app.use(Cors());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(passport.initialize());
 app.use(morgan('dev'));
 
 app.use('/', indexRouter);
+app.use('/registerUser', registerRouter);
 
 // Get port from environment and store in Express.
 const port = process.env.PORT || '3000';
