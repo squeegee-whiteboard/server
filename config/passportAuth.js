@@ -12,7 +12,7 @@ const { User } = models;
 const BCRYPT_SALT_ROUNDS = 12;
 const debug = Debug('server');
 
-// defines the local strategy
+// defines the local register strategy
 passport.use(
   'local-register',
   new LocalStrategy(
@@ -54,6 +54,7 @@ passport.use(
 
 const BAD_LOGIN_MESSAGE = 'Incorrect email or password.';
 
+// defines local-login strategy
 passport.use(
   'local-login',
   new LocalStrategy(
@@ -90,6 +91,8 @@ passport.use(
   ),
 );
 
+const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
+
 const opts = {
   jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('JWT'),
   secretOrKey: jwtSecret.secret,
@@ -103,6 +106,7 @@ passport.use(
       User.findOne({
         where: {
           id: jwtPayload.id,
+          password: jwtPayload.password,
         },
       }).then((foundUser) => {
         if (foundUser) {
@@ -110,8 +114,8 @@ passport.use(
           // note the return is removed with passport JWT - add this return for passport local
           done(null, foundUser);
         } else {
-          debug('User not found in database');
-          done(null, false);
+          debug(`User with id ${jwtPayload.id} and that password hash does not exist`);
+          done(null, false, { message: BAD_TOKEN_MESSAGE });
         }
       });
     } catch (error) {

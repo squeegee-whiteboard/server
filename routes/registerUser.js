@@ -48,7 +48,12 @@ router.post('/', (req, res, next) => {
             })
               .then(() => {
                 debug('User created in the database');
-                const token = jwt.sign({ id: foundUser.id }, jwtSecret.secret);
+
+                const token = jwt.sign({
+                  id: foundUser.id,
+                  password: foundUser.password,
+                }, jwtSecret.secret);
+
                 res.status(200).send({
                   success: true,
                   token,
