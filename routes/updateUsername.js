@@ -38,7 +38,7 @@ router.patch('/', (req, res, next) => {
               username: req.body.username,
             })
             .then(() => {
-              debug('user updated');
+              debug('Username updated');
 
               res.status(200).send({ success: true, message: 'Username updated' });
             });

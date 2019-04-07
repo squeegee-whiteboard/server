@@ -102,7 +102,10 @@ passport.use(
   'jwt',
   new JWTstrategy(opts, (jwtPayload, done) => {
     try {
-      debug(jwtPayload.id);
+      if (jwtPayload.id === undefined || jwtPayload.password === undefined) {
+        done(null, false, { message: BAD_TOKEN_MESSAGE });
+      }
+
       User.findOne({
         where: {
           id: jwtPayload.id,
