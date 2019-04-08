@@ -157,7 +157,7 @@ Ex:
 {
     "success": true,
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicGFzc3dv",
-    "message": "User successfully created."
+    "message": "User logged in."
 }
 ```
 
