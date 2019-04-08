@@ -17,7 +17,7 @@ const bcrypt = require('bcrypt');
 const BCRYPT_SALT_ROUNDS = 12;
 
 router.patch('/', (req, res, next) => {
-  if (req.username){
+  if (req.body.username){
     User.findOne({
       where: {
         username: req.username,
@@ -46,8 +46,9 @@ router.patch('/', (req, res, next) => {
   
   if (req.email){
     User.findOne({
+      //Make sure another user isn't using this email, first.
       where: {
-        email: req.email,
+        email: req.body.email,
         id: {[Op.ne]: req.user.id}
       },
     }).then((existingUser) => {
@@ -75,14 +76,14 @@ router.patch('/', (req, res, next) => {
     User.findOne({
       where: {id: req.user.id}
     }).then((foundUser) =>{
-      bcrypt.compare(req.oldPassword, foundUser.password, function(err, isMatch){
+      bcrypt.compare(req.body.oldPassword, foundUser.password, function(err, isMatch){
         if (err){
           debug(err);
           res.json({success: false, msg: 'There was an error updating the password.'});
         }
         else if (isMatch){
           bcrypt.genSalt(BCRYPT_SALT_ROUNDS, function(err, salt){
-            bcrypt.hash(req.newPassword, salt, function(err, hashedPassword){
+            bcrypt.hash(req.body.newPassword, salt, function(err, hashedPassword){
               foundUser.update({password: hashedPassword})
               .then(() => {res.status(200).send({
                   success: true,
