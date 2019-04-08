@@ -194,6 +194,7 @@ await axios.get('http://localhost:3000/updateUsername', {
 
 ## PATCH - /updateUsername
 Changes the user's name.
+Requires a user's auth token in the message header.
 
 ### Input
 PATCH request to the endpoint url.
@@ -209,7 +210,7 @@ JSON object in the form:
 Ex:
 ```javascript
 {
-	"username":
+	"username": "joel"
 }
 ```
 
