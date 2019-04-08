@@ -8,8 +8,8 @@ const jwtSecret = require('../config/jwtConfig');
 const { User } = models;
 const debug = Debug('server');
 
-/* GET /loginUser */
-router.get('/', (req, res, next) => {
+/* POST /loginUser */
+router.post('/', (req, res, next) => {
   passport.authenticate('local-login', (error, loginUser, info) => {
     // not user facing error in login
     if (error) {
