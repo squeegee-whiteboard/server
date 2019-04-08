@@ -7,16 +7,16 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const models = require('./models');
 
-const indexRouter = require('./routes/index');
-const registerRouter = require('./routes/registerUser');
-const loginRouter = require('./routes/loginUser');
-const updateUsernameRouter = require('./routes/updateUsername');
+const profileRouter = require('./routes/profile');
+const authRouter = require('./routes/auth');
+//const indexRouter = require('./routes/index');
 
 const app = express();
 const debug = Debug('server');
 
 // Configure middleware
-require('./config/passportAuth');
+require('./config/passport');
+
 
 app.use(Cors());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,10 +24,15 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(morgan('dev'));
 
-app.use('/', indexRouter);
-app.use('/registerUser', registerRouter);
-app.use('/loginUser', loginRouter);
-app.use('/updateUsername', updateUsernameRouter);
+//app.use('/', indexRouter);
+app.use('/profile', passport.authenticate('jwt', {session: false}), profileRouter);
+app.use('/auth', authRouter);
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 // Get port from environment and store in Express.
 const port = process.env.PORT || '3000';
