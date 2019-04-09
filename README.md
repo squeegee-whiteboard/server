@@ -40,11 +40,21 @@ info, see the above link to the debug project on github.
 Currently uses port `3000` by default.
 
 ## Normal Endpoints
-* POST - /registerUser
+* POST - /auth/register
+* POST - /auth/login
 
 ## JWT Endpoints
-* POST - /loginUser
-* PATCH - /updateUsername
+* PATCH - /changeUser/username
+* PATCH - /changeUser/email
+* PATCH - /changeUser/password
+
+* POST - /changeBoard/create
+* PATCH - /changeBoard/name
+* PUT - /changeBoard/addMember
+* DELETE - /changeBoard/delete
+
+* GET - /boardInfo/owned
+* GET - /boardInfo/member
 
 # Normal Endpoints
 These endpoints don't require an auth token, but will return one.
@@ -59,7 +69,7 @@ axios.post('http://localhost:3000/loginUser', {
     });
 ```
 
-## POST - /registerUser
+## POST - /auth/register
 Registers a new user.
 Email must be unique.
 Returns your auth token on success.
@@ -67,7 +77,7 @@ Returns your auth token on success.
 ### Input
 POST request to the endpoint url.
 
-Ex: `localhost:3000/registerUser`
+Ex: `localhost:3000/auth/register`
 
 JSON object in the form:
 ```javascript
@@ -99,7 +109,7 @@ Ex:
 ```javascript
 {
     "success": true,
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicGFzc3dv",
+    "token": "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicGFzc3dv",
     "message": "User successfully created."
 }
 ```
@@ -126,7 +136,7 @@ Returns your auth token on success.
 ### Input
 POST request to the endpoint url.
 
-Ex: `localhost:3000/loginUser`
+Ex: `localhost:3000/auth/login`
 
 JSON object in the form:
 ```javascript
@@ -156,7 +166,7 @@ Ex:
 ```javascript
 {
     "success": true,
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicGFzc3dv",
+    "token": "JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwicGFzc3dv",
     "message": "User logged in."
 }
 ```
@@ -192,14 +202,14 @@ await axios.get('http://localhost:3000/updateUsername', {
         });
 ```
 
-## PATCH - /updateUsername
+## PATCH - /changeUser/username
 Changes the user's name.
 Requires a user's auth token in the message header.
 
 ### Input
 PATCH request to the endpoint url.
 
-Ex: `localhost:3000/updateUsername`
+Ex: `localhost:3000/changeUser/username`
 
 JSON object in the form:
 ```javascript
@@ -242,5 +252,443 @@ JSON object in the form:
 {
     "success": false,
     "message": "Invalid auth token."
+}
+```
+
+## PATCH - /changeUser/email
+Changes the user's email.
+Requires a user's auth token in the message header.
+
+### Input
+PATCH request to the endpoint url.
+
+Ex: `localhost:3000/changeUser/email`
+
+JSON object in the form:
+```javascript
+{
+	"email": <email you want to change to>
+}
+```
+Ex:
+```javascript
+{
+	"email": "joel@squeegee.xyz"
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Email updated."
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Invalid auth token."
+}
+```
+
+## PATCH - /changeUser/password
+Changes the user's password.
+Requires a user's auth token in the message header.
+
+### Input
+PATCH request to the endpoint url.
+
+Ex: `localhost:3000/changeUser/password`
+
+JSON object in the form:
+```javascript
+{
+    "old_pass": <password changing from>,
+    "new_pass": <password changing to>
+}
+```
+Ex:
+```javascript
+{
+	"old_pass": "hunter2",
+    "new_pass": "letmein"
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Password updated."
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to update password."
+}
+```
+
+## POST - /changeBoard/create
+Creates a board and adds the creating user as an owner.
+
+### Input
+POST request to the endpoint url.
+
+Ex: `localhost:3000/changeBoard/create`
+
+JSON object in the form:
+```javascript
+{
+    "name": <board name>
+}
+```
+Ex:
+```javascript
+{
+	"name": "ex name"
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "board_id": <the boards identifier (may be int or hash)>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Password updated."
+    "board_id": 1
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to create board."
+}
+```
+
+## PATCH - /changeBoard/name
+Creates a board and adds the creating user as an owner.
+
+### Input
+PATCH request to the endpoint url.
+
+Ex: `localhost:3000/changeBoard/name`
+
+JSON object in the form:
+```javascript
+{
+    "name": <board name>,
+    "board_id": <the boards identifier (may be int or hash)>
+}
+```
+Ex:
+```javascript
+{
+    "name": "ex name",
+    "board_id": 1
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Board name updated."
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to update name."
+}
+```
+
+## PUT - /changeBoard/addMember
+Creates a board and adds the creating user as an owner.
+
+### Input
+PUT request to the endpoint url.
+
+Ex: `localhost:3000/changeBoard/addMember'
+
+JSON object in the form:
+```javascript
+{
+    "board_id": <the boards identifier (may be int or hash)>
+}
+```
+Ex:
+```javascript
+{
+	"board_id": 1
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "User added to board."
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to add user to board."
+}
+```
+
+## DELETE - /changeBoard/delete
+Creates a board and adds the creating user as an owner.
+
+### Input
+DELETE request to the endpoint url.
+
+Ex: `localhost:3000/changeBoard/delete'
+
+JSON object in the form:
+```javascript
+{
+    "board_id": <the boards identifier (may be int or hash)>
+}
+```
+Ex:
+```javascript
+{
+	"board_id": 1
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Board deleted."
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to delete board."
+}
+```
+
+## GET - /boardInfo/owned
+Gets the list of boards owned by the user.
+If user owns no board, return empty list.
+
+### Input
+GET request to the endpoint url.
+
+Ex: `localhost:3000/boardInfo/owned'
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "boards": [
+        {
+            "board_name": <the board's name>,
+            "board_id": <the boards identifier (may be int or hash)>
+        },
+        ...
+    ]
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Successfully retrieved boards.",
+    "boards": [
+        {
+            "board_name": "joels cool board",
+            "board_id": 1 
+        },
+        {
+            "board_name": "joels other cooler board",
+            "board_id": 2 
+        }
+    ]
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to retrieve owned boards"
+}
+```
+
+## GET - /boardInfo/member
+Gets the list of boards the user is a member of.
+If user is not a member of any boards, return empty list.
+
+### Input
+GET request to the endpoint url.
+
+Ex: `localhost:3000/boardInfo/member'
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "boards": [
+        {
+            "board_name": <the board's name>,
+            "board_id": <the boards identifier (may be int or hash)>
+        },
+        ...
+    ]
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Successfully retrieved boards.",
+    "boards": [
+        {
+            "board_name": "joels cool board",
+            "board_id": 1 
+        },
+        {
+            "board_name": "joels other cooler board",
+            "board_id": 2 
+        },
+        {
+            "board_name": "chris's other coolest board",
+            "board_id": 3 
+        }
+    ]
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to retrieve member boards"
 }
 ```

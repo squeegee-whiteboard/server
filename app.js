@@ -7,9 +7,9 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const models = require('./models');
 
-const profileRouter = require('./routes/profile');
+const changeUserRouter = require('./routes/changeUser');
 const authRouter = require('./routes/auth');
-//const indexRouter = require('./routes/index');
+// const indexRouter = require('./routes/index');
 
 const app = express();
 const debug = Debug('server');
@@ -17,20 +17,19 @@ const debug = Debug('server');
 // Configure middleware
 require('./config/passport');
 
-
 app.use(Cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(morgan('dev'));
 
-//app.use('/', indexRouter);
-app.use('/profile', passport.authenticate('jwt', {session: false}), profileRouter);
+// app.use('/', indexRouter);
+app.use('/changeUser', changeUserRouter);
 app.use('/auth', authRouter);
 
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
