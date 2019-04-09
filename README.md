@@ -690,17 +690,29 @@ Ex:
     "success": true,
     "message": "Successfully retrieved boards.",
     "boards": [
-        {
-            "board_name": "joels cool board",
-            "board_id": 1 
+       {
+            "id": 1,
+            "board_name": "AwesomeBoard",
+            "state": [],
+            "is_enabled": false,
+            "createdAt": "2019-04-09T17:20:33.791Z",
+            "updatedAt": "2019-04-09T17:56:04.529Z",
+            "owner_id": 1,
+            "board_members": {
+                "createdAt": "2019-04-09T17:20:33.823Z",
+                "updatedAt": "2019-04-09T17:20:33.823Z",
+                "board_id": 1,
+                "user_id": 1
         },
         {
-            "board_name": "joels other cooler board",
-            "board_id": 2 
+            "id": 2,
+            "board_name": "secondBoard",
+            ...
         },
-        {
-            "board_name": "chris's other coolest board",
-            "board_id": 3 
+	{
+            "id": 3,
+            "board_name": "Someone Else's Board",
+            ...
         }
     ]
 }
