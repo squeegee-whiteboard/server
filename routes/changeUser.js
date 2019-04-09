@@ -22,7 +22,7 @@ const { User } = models;
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
 router.patch('/username', (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.username) {
       User.findOne({
@@ -42,7 +42,7 @@ router.patch('/username', (req, res, next) => {
 });
 
 router.patch('/email', (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.email) {
       User.findOne({
@@ -73,8 +73,8 @@ router.patch('/email', (req, res, next) => {
   })(req, res, next);
 });
 
-router.patch('/username', (req, res, next) => {
-  passport.authenticate('jwt', { session: false }, (err, user, info) => {
+router.patch('/password', (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.newPassword && req.body.oldPassword) {
       User.findOne({
@@ -89,6 +89,7 @@ router.patch('/username', (req, res, next) => {
               bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
                 foundUser.update({ password: hashedPassword })
                   .then(() => {
+                    console.log("get here");
                     const token = jwt.sign({
                       id: foundUser.id,
                       password: hashedPassword,

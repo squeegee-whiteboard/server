@@ -18,7 +18,7 @@ module.exports = (passport) => {
       if (jwtPayload.id === undefined || jwtPayload.password === undefined) {
         return done(null, false, { message: BAD_TOKEN_MESSAGE });
       }
-      User.findOne({
+      return User.findOne({
         where: {
           id: jwtPayload.id,
           password: jwtPayload.password,
