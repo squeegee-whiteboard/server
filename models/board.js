@@ -11,6 +11,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: [],
     },
+    is_enabled: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   }, {});
   Board.associate = (models) => {
     // associations can be defined here

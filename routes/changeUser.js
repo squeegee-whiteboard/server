@@ -37,6 +37,8 @@ router.patch('/username', (req, res, next) => {
             res.json({ success: true, message: 'Username updated.' });
           });
       });
+    } else {
+      res.json({ success: false, message: 'No new username provided.' });
     }
   })(req, res, next);
 });
@@ -69,6 +71,8 @@ router.patch('/email', (req, res, next) => {
           });
         }
       });
+    } else {
+      res.json({ success: false, message: 'No new email provided.' });
     }
   })(req, res, next);
 });
@@ -89,7 +93,6 @@ router.patch('/password', (req, res, next) => {
               bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
                 foundUser.update({ password: hashedPassword })
                   .then(() => {
-                    console.log("get here");
                     const token = jwt.sign({
                       id: foundUser.id,
                       password: hashedPassword,
@@ -107,6 +110,8 @@ router.patch('/password', (req, res, next) => {
           }
         });
       });
+    } else {
+      res.json({ success: false, message: 'Request requires both oldPassword and newPassword fields.' });
     }
   })(req, res, next);
 });

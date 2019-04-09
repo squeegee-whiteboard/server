@@ -320,15 +320,15 @@ Ex: `localhost:3000/changeUser/password`
 JSON object in the form:
 ```javascript
 {
-    "old_pass": <password changing from>,
-    "new_pass": <password changing to>
+    "oldPassword": <password changing from>,
+    "newPassword": <password changing to>
 }
 ```
 Ex:
 ```javascript
 {
-	"old_pass": "hunter2",
-    "new_pass": "letmein"
+	"oldPassword": "hunter2",
+    "newPassword": "letmein"
 }
 ```
 
@@ -592,8 +592,12 @@ JSON object in the form:
     "message": <success message>,
     "boards": [
         {
-            "board_name": <the board's name>,
-            "board_id": <the boards identifier (may be int or hash)>
+            "id": <board identifier (may be int or hash)>,
+            "board_name": <board name>,
+            "state": <board state>,
+            "is_enabled": <whether board has been 'deleted'>,
+            "owner_id": <id of board creator>,
+            ...
         },
         ...
     ]
@@ -606,12 +610,32 @@ Ex:
     "message": "Successfully retrieved boards.",
     "boards": [
         {
-            "board_name": "joels cool board",
-            "board_id": 1 
+            "id": 1,
+            "board_name": "AwesomeBoard",
+            "state": [],
+            "is_enabled": false,
+            "createdAt": "2019-04-09T17:20:33.791Z",
+            "updatedAt": "2019-04-09T17:56:04.529Z",
+            "owner_id": 1,
+            "board_members": {
+                "createdAt": "2019-04-09T17:20:33.823Z",
+                "updatedAt": "2019-04-09T17:20:33.823Z",
+                "board_id": 1,
+                "user_id": 1
         },
         {
-            "board_name": "joels other cooler board",
-            "board_id": 2 
+             "id": 2,
+            "board_name": "secondBoard",
+            "state": [],
+            "is_enabled": false,
+            "createdAt": "2019-04-09T17:28:13.005Z",
+            "updatedAt": "2019-04-09T17:56:01.609Z",
+            "owner_id": 2,
+            "board_members": {
+                "createdAt": "2019-04-09T17:32:06.260Z",
+                "updatedAt": "2019-04-09T17:32:06.260Z",
+                "board_id": 2,
+                "user_id": 1
         }
     ]
 }
@@ -649,8 +673,12 @@ JSON object in the form:
     "message": <success message>,
     "boards": [
         {
-            "board_name": <the board's name>,
-            "board_id": <the boards identifier (may be int or hash)>
+            "id": <board identifier (may be int or hash)>,
+            "board_name": <board name>,
+            "state": <board state>,
+            "is_enabled": <whether board has been 'deleted'>,
+            "owner_id": <id of board creator>,
+            ...
         },
         ...
     ]
