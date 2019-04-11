@@ -363,6 +363,51 @@ JSON object in the form:
 }
 ```
 
+## GET - /changeUser/info
+Gets the logged in user's username and email address.
+Does not get password, since passwords aren't even stored as plaintext.
+
+### Input
+GET request to the endpoint url.
+
+Ex: `localhost:3000/changeUser/info'
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "username": <user's username>,
+    "email": <user's email>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Successfully retrieved user info.",
+    "username": "JollyJoel",
+    "email": "joel@email.com"
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Failed to retrieve owned boards"
+}
+```
+
+
 ## POST - /changeBoard/create
 Creates a board and adds the creating user as an owner.
 
@@ -397,7 +442,7 @@ Ex:
 ```javascript
 {
     "success": true,
-    "message": "Password updated."
+    "message": "Board created."
     "board_id": 1
 }
 ```
