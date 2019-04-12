@@ -47,6 +47,7 @@ Currently uses port `3000` by default.
 * PATCH - /changeUser/username
 * PATCH - /changeUser/email
 * PATCH - /changeUser/password
+* GET - /changeUser/info
 
 * POST - /changeBoard/create
 * PATCH - /changeBoard/name
@@ -129,7 +130,7 @@ JSON object in the form:
 }
 ```
 
-## POST - /loginUser
+## POST - /auth/login
 Logs the user in.
 Returns your auth token on success.
 
