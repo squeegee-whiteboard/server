@@ -22,7 +22,7 @@ const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
 router.post('/create', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.name) {
       try {
         User.findOne({
@@ -34,7 +34,7 @@ router.post('/create', (req, res, next) => {
             owner_id: user.id,
           }).then((createdBoard) => {
             foundUser.addBoard(createdBoard);
-            res.json({
+            return res.json({
               success: true,
               message: 'Board created.',
               board_id: createdBoard.id,
@@ -42,10 +42,10 @@ router.post('/create', (req, res, next) => {
           });
         });
       } catch (err2) {
-        res.json({ success: false, message: 'Failed to create board.' });
+        return res.json({ success: false, message: 'Failed to create board.' });
       }
     } else {
-      res.json({ success: false, message: 'No board name provided.' });
+      return res.json({ success: false, message: 'No board name provided.' });
     }
   })(req, res, next);
 });
@@ -61,25 +61,25 @@ router.patch('/name', (req, res, next) => {
           foundUser.getBoards({ where: { id: req.body.board_id } }).then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               associatedBoards[0].update({ board_name: req.body.name }).then(() => {
-                res.json({ success: true, message: 'Board name updated.' });
+                return res.json({ success: true, message: 'Board name updated.' });
               });
             } else {
-              res.json({ success: false, message: 'Failed to update name.' });
+              return res.json({ success: false, message: 'Failed to update name.' });
             }
           });
         });
       } catch (err2) {
-        res.json({ success: false, message: 'Failed to update name.' });
+        return res.json({ success: false, message: 'Failed to update name.' });
       }
     } else {
-      res.json({ success: false, message: 'Board name and board_id must both be provided.' });
+      return res.json({ success: false, message: 'Board name and board_id must both be provided.' });
     }
   })(req, res, next);
 });
 
 router.put('/addMember', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.board_id) {
       try {
         User.findOne({
@@ -88,11 +88,11 @@ router.put('/addMember', (req, res, next) => {
           Board.findOne({ where: { id: req.body.board_id } }).then((foundBoard) => {
             foundUser.addBoard(foundBoard);
           }).then(() => {
-            res.json({ success: true, message: 'User added to board.' });
+            return res.json({ success: true, message: 'User added to board.' });
           });
         });
       } catch (err2) {
-        res.json({ success: false, message: 'No board_id provided.' });
+        return res.json({ success: false, message: 'No board_id provided.' });
       }
     }
   })(req, res, next);
@@ -100,7 +100,7 @@ router.put('/addMember', (req, res, next) => {
 
 router.delete('/delete', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.board_id) {
       try {
         User.findOne({
@@ -109,18 +109,18 @@ router.delete('/delete', (req, res, next) => {
           foundUser.getBoards({ where: { id: req.body.board_id } }).then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               associatedBoards[0].update({ is_enabled: false }).then(() => {
-                res.json({ success: true, message: 'Board disabled.' });
+                return res.json({ success: true, message: 'Board disabled.' });
               });
             } else {
-              res.json({ success: false, message: 'Failed to disable board.' });
+              return res.json({ success: false, message: 'Failed to disable board.' });
             }
           });
         });
       } catch (err2) {
-        res.json({ success: false, message: 'Failed to disable board.' });
+        return res.json({ success: false, message: 'Failed to disable board.' });
       }
     } else {
-      res.json({ success: false, message: 'No board_id provided.' });
+      return res.json({ success: false, message: 'No board_id provided.' });
     }
   })(req, res, next);
 });

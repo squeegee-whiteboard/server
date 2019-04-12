@@ -23,24 +23,24 @@ const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
 router.get('/info', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
       User.findOne({
         where: { id: user.id },
       }).then((foundUser) => {
-        res.json({
+        return res.json({
           success: true, username: foundUser.username, email: foundUser.email, message: 'User info successfully retrieved.',
         });
       });
     } catch (err2) {
-      res.json({ success: false, message: 'Failed to retrieve user info.' });
+      return res.json({ success: false, message: 'Failed to retrieve user info.' });
     }
   })(req, res, next);
 });
 
 router.patch('/username', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.username) {
       try {
         User.findOne({
@@ -52,21 +52,21 @@ router.patch('/username', (req, res, next) => {
             .then(() => {
               debug('Username updated');
 
-              res.json({ success: true, message: 'Username updated.' });
+              return res.json({ success: true, message: 'Username updated.' });
             });
         });
       } catch (err2) {
-        res.json({ success: false, message: 'Failed to change username.' });
+        return res.json({ success: false, message: 'Failed to change username.' });
       }
     } else {
-      res.json({ success: false, message: 'No new username provided.' });
+      return res.json({ success: false, message: 'No new username provided.' });
     }
   })(req, res, next);
 });
 
 router.patch('/email', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.email) {
       try {
         User.findOne({
@@ -77,7 +77,7 @@ router.patch('/email', (req, res, next) => {
           },
         }).then((existingUser) => {
           if (existingUser) {
-            res.json({ success: false, msg: 'Someone else is using that email!' });
+            return res.json({ success: false, msg: 'Someone else is using that email!' });
           } else {
             User.findOne({
               where: { id: user.id },
@@ -88,23 +88,23 @@ router.patch('/email', (req, res, next) => {
                 .then(() => {
                   debug('email updated');
 
-                  res.json({ success: true, message: 'Email updated.' });
+                  return res.json({ success: true, message: 'Email updated.' });
                 });
             });
           }
         });
       } catch (err2) {
-        res.json({ success: false, message: 'Failed to update email address.' });
+        return res.json({ success: false, message: 'Failed to update email address.' });
       }
     } else {
-      res.json({ success: false, message: 'No new email provided.' });
+      return res.json({ success: false, message: 'No new email provided.' });
     }
   })(req, res, next);
 });
 
 router.patch('/password', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.newPassword && req.body.oldPassword) {
       try {
         User.findOne({
@@ -113,7 +113,7 @@ router.patch('/password', (req, res, next) => {
           bcrypt.compare(req.body.oldPassword, foundUser.password, (err2, isMatch) => {
             if (err2) {
               debug(err2);
-              res.json({ success: false, message: 'There was an error updating the password.' });
+              return res.json({ success: false, message: 'There was an error updating the password.' });
             } else if (isMatch) {
               bcrypt.genSalt(saltRounds, (err3, salt) => {
                 bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
@@ -123,7 +123,7 @@ router.patch('/password', (req, res, next) => {
                         id: foundUser.id,
                         password: hashedPassword,
                       }, jwtSecret.secret);
-                      res.json({
+                      return res.json({
                         success: true,
                         token: `JWT ${token}`,
                         message: 'Password successfully updated.',
@@ -132,15 +132,15 @@ router.patch('/password', (req, res, next) => {
                 });
               });
             } else {
-              res.json({ success: false, message: 'Wrong old password.' });
+              return res.json({ success: false, message: 'Wrong old password.' });
             }
           });
         });
       } catch (err5) {
-        res.json({ success: false, message: 'There was an error updating the password.' });
+        return res.json({ success: false, message: 'There was an error updating the password.' });
       }
     } else {
-      res.json({ success: false, message: 'Request requires both oldPassword and newPassword fields.' });
+      return res.json({ success: false, message: 'Request requires both oldPassword and newPassword fields.' });
     }
   })(req, res, next);
 });

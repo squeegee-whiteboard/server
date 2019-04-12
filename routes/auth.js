@@ -15,7 +15,7 @@ const { saltRounds } = require('../config/bcryptConfig');
 
 router.post('/register', (req, res) => {
   if (!req.body.username || !req.body.password || !req.body.email) {
-    res.json({ success: false, msg: 'Please pass username, email, and password.' });
+    return res.json({ success: false, msg: 'Please pass username, email, and password.' });
     // console.log(req.body);
   } else {
     User.findOne({
@@ -25,7 +25,7 @@ router.post('/register', (req, res) => {
       },
     }).then((foundUser) => {
       if (foundUser) {
-        res.json({ success: false, msg: 'Email already exists.' });
+        return res.json({ success: false, msg: 'Email already exists.' });
       }
 
       bcrypt.genSalt(saltRounds, (err, salt) => {
@@ -41,7 +41,7 @@ router.post('/register', (req, res) => {
                 id: createdUser.id,
                 password: createdUser.password,
               }, jwtSecret.secret);
-              res.json({
+              return res.json({
                 success: true,
                 token: `JWT ${token}`,
                 message: 'User successfully created.',
