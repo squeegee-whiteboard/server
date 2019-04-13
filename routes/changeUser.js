@@ -1,11 +1,9 @@
 const Debug = require('debug');
 const Sequelize = require('sequelize');
-
 const express = require('express');
 
 const router = express.Router();
 const passport = require('passport');
-
 
 const debug = Debug('server');
 
