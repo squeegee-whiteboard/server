@@ -56,6 +56,7 @@ Currently uses port `3000` by default.
 
 * GET - /boardInfo/owned
 * GET - /boardInfo/member
+* GET - /boardInfo/isMember
 
 # Normal Endpoints
 These endpoints don't require an auth token, but will return one.
@@ -436,7 +437,7 @@ JSON object in the form:
 {
     "success": true,
     "message": <success message>,
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
@@ -444,7 +445,7 @@ Ex:
 {
     "success": true,
     "message": "Board created."
-    "board_id": 1
+    "board_id": "dhohohi32y948234"
 }
 ```
 
@@ -475,14 +476,14 @@ JSON object in the form:
 ```javascript
 {
     "name": <board name>,
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
 ```javascript
 {
     "name": "ex name",
-    "board_id": 1
+    "board_id": "askjdhqiuhiuqoij3920"
 }
 ```
 
@@ -528,13 +529,12 @@ Ex: `localhost:3000/changeBoard/addMember'
 JSON object in the form:
 ```javascript
 {
-    "board_id": <the boards identifier (may be int or hash)>
-}
+    "board_id": <base64 board identifier string>
 ```
 Ex:
 ```javascript
 {
-	"board_id": 1
+	"board_id": "iuhd929823h9dh2"
 }
 ```
 
@@ -580,13 +580,13 @@ Ex: `localhost:3000/changeBoard/delete'
 JSON object in the form:
 ```javascript
 {
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
 ```javascript
 {
-	"board_id": 1
+	"board_id": "kjshf2982u39823u"
 }
 ```
 
@@ -695,7 +695,7 @@ JSON object in the form:
     "message": <success message>,
     "boards": [
         {
-            "board_id": <board identifier (may be int or hash)>,
+            "board_id": <base64 board identifier string>,
             "board_name": <board name>,
         },
         ...
@@ -736,5 +736,59 @@ JSON object in the form:
 {
     "success": false,
     "message": "Failed to retrieve member boards"
+}
+```
+
+## GET - /boardInfo/isMember
+Returns if a user is a member of a board or not.
+
+### Input
+GET request to the endpoint url.
+
+Ex: `localhost:3000/boardInfo/isMember`
+
+JSON object in the form:
+```javascript
+{
+    "board_id": <base64 board identifier string>
+}
+```
+Ex:
+```javascript
+{
+    "board_id": "hd292898h239hd2"
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "is_member": <true/false>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Member found."
+    "is_member": true
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Could not access API server."
 }
 ```

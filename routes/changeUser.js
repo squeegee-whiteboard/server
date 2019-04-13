@@ -23,14 +23,12 @@ router.get('/info', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
-      User.findOne({
-        where: { id: user.id },
-      }).then(foundUser => res.json({
+      return res.json({
         success: true,
-        username: foundUser.username,
-        email: foundUser.email,
+        username: user.username,
+        email: user.email,
         message: 'User info successfully retrieved.',
-      }));
+      });
     } catch (err2) {
       return res.json({ success: false, message: 'Failed to retrieve user info.' });
     }
@@ -42,17 +40,11 @@ router.patch('/username', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.username) {
       try {
-        User.findOne({
-          where: { id: user.id },
-        }).then((foundUser) => {
-          foundUser.update({
-            username: req.body.username,
-          })
-            .then(() => {
-              debug('Username updated');
-
-              return res.json({ success: true, message: 'Username updated.' });
-            });
+        return user.update({
+          username: req.body.username,
+        }).then(() => {
+          debug('Username updated');
+          return res.json({ success: true, message: 'Username updated.' });
         });
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to change username.' });
@@ -68,7 +60,7 @@ router.patch('/email', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.email) {
       try {
-        User.findOne({
+        return User.findOne({
         // Make sure another user isn't using this email, first.
           where: {
             email: req.body.email,
@@ -78,17 +70,11 @@ router.patch('/email', (req, res, next) => {
           if (existingUser) {
             return res.json({ success: false, msg: 'Someone else is using that email!' });
           }
-          User.findOne({
-            where: { id: user.id },
-          }).then((foundUser) => {
-            foundUser.update({
-              email: req.body.email,
-            })
-              .then(() => {
-                debug('email updated');
-
-                return res.json({ success: true, message: 'Email updated.' });
-              });
+          return user.update({
+            email: req.body.email,
+          }).then(() => {
+            debug('email updated');
+            return res.json({ success: true, message: 'Email updated.' });
           });
         });
       } catch (err2) {
@@ -105,34 +91,29 @@ router.patch('/password', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.newPassword && req.body.oldPassword) {
       try {
-        User.findOne({
-          where: { id: user.id },
-        }).then((foundUser) => {
-          bcrypt.compare(req.body.oldPassword, foundUser.password, (err2, isMatch) => {
-            if (err2) {
-              debug(err2);
-              return res.json({ success: false, message: 'There was an error updating the password.' });
-            } if (isMatch) {
-              bcrypt.genSalt(saltRounds, (err3, salt) => {
-                bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
-                  foundUser.update({ password: hashedPassword })
-                    .then(() => {
-                      const token = jwt.sign({
-                        id: foundUser.id,
-                        password: hashedPassword,
-                      }, jwtSecret.secret);
-                      return res.json({
-                        success: true,
-                        token: `JWT ${token}`,
-                        message: 'Password successfully updated.',
-                      });
-                    });
+        return bcrypt.compare(req.body.oldPassword, user.password, (err2, isMatch) => {
+          if (err2) {
+            debug(err2);
+            return res.json({ success: false, message: 'There was an error updating the password.' });
+          }
+          if (isMatch) {
+            return bcrypt.genSalt(saltRounds, (err3, salt) => {
+              bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
+                user.update({ password: hashedPassword }).then(() => {
+                  const token = jwt.sign({
+                    id: user.id,
+                    password: hashedPassword,
+                  }, jwtSecret.secret);
+                  return res.json({
+                    success: true,
+                    token: `JWT ${token}`,
+                    message: 'Password successfully updated.',
+                  });
                 });
               });
-            } else {
-              return res.json({ success: false, message: 'Wrong old password.' });
-            }
-          });
+            });
+          }
+          return res.json({ success: false, message: 'Wrong old password.' });
         });
       } catch (err5) {
         return res.json({ success: false, message: 'There was an error updating the password.' });

@@ -35,18 +35,17 @@ router.post('/register', (req, res) => {
           email: req.body.email,
           password: hashedPassword,
           is_admin: false,
-        })
-          .then((createdUser) => {
-            const token = jwt.sign({
-              id: createdUser.id,
-              password: createdUser.password,
-            }, jwtSecret.secret);
-            return res.json({
-              success: true,
-              token: `JWT ${token}`,
-              message: 'User successfully created.',
-            });
+        }).then((createdUser) => {
+          const token = jwt.sign({
+            id: createdUser.id,
+            password: createdUser.password,
+          }, jwtSecret.secret);
+          return res.json({
+            success: true,
+            token: `JWT ${token}`,
+            message: 'User successfully created.',
           });
+        });
       });
     });
   });

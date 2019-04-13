@@ -52,7 +52,7 @@ router.get('/member', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
       if (user.is_admin) {
-        Board.findAll().then((foundBoards) => {
+        return Board.findAll().then((foundBoards) => {
           const boardList = [];
 
           foundBoards.forEach((board) => {
@@ -86,6 +86,51 @@ router.get('/member', (req, res, next) => {
       });
     } catch (err2) {
       return res.json({ success: false, message: 'Failed to retrieve member boards.' });
+    }
+  })(req, res, next);
+});
+
+// GET /boardInfo/isMember endpoint
+// Returns whether or not the requesting user is a member of the specified board
+router.get('/isMember', (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    try {
+      if (user.is_admin) {
+        return Board.findAll({
+          where: { board_url: req.body.board_id },
+        }).then((foundBoards) => {
+          if (foundBoards.length >= 1) {
+            return res.json({
+              success: true,
+              message: 'Membership found.',
+              is_member: true,
+            });
+          }
+          return res.json({
+            success: false,
+            message: 'Board does not exist.',
+          });
+        });
+      }
+      return user.getBoards({
+        where: { board_url: req.body.board_id },
+      }).then((foundBoard) => {
+        if (foundBoard.length >= 1) {
+          return res.json({
+            success: true,
+            message: 'Membership found.',
+            is_member: true,
+          });
+        }
+        return res.json({
+          success: true,
+          message: 'Membership not found.',
+          is_member: false,
+        });
+      });
+    } catch (err2) {
+      return res.json({ success: false, message: 'Failed to determine member status boards.' });
     }
   })(req, res, next);
 });
