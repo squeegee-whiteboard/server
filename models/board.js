@@ -22,9 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     board_url: {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: function () {
-        let uuid = uuidv4();
-        let b64url = base64url(uuid);
+      defaultValue: () => {
+        const uuid = uuidv4();
+        const b64url = base64url(uuid);
         return b64url;
       },
     },
@@ -44,8 +44,8 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
-  Board.prototype.toSimpleObject = function() {
-    let simpleBoard = {
+  Board.prototype.toSimpleObject = function toSimpleObject() {
+    const simpleBoard = {
       board_id: this.board_url,
       board_name: this.board_name,
     };

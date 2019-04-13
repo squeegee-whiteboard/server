@@ -24,13 +24,13 @@ router.get('/owned', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
-      Board.findAll({ 
-          where: { 
-            owner_id: user.id,
-            is_enabled: true,
-          } 
-        }).then((foundBoards) => {
-        let boardList = [];
+      return Board.findAll({
+        where: {
+          owner_id: user.id,
+          is_enabled: true,
+        },
+      }).then((foundBoards) => {
+        const boardList = [];
 
         foundBoards.forEach((board) => {
           boardList.push(board.toSimpleObject());
@@ -51,9 +51,9 @@ router.get('/member', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
-      if(user.is_admin) {
+      if (user.is_admin) {
         Board.findAll().then((foundBoards) => {
-          let boardList = [];
+          const boardList = [];
 
           foundBoards.forEach((board) => {
             boardList.push(board.toSimpleObject());
@@ -65,14 +65,14 @@ router.get('/member', (req, res, next) => {
           });
         });
       }
-    
-      User.findOne({
+
+      return User.findOne({
         where: { id: user.id },
       }).then((foundUser) => {
         foundUser.getBoards({
           where: { is_enabled: true },
         }).then((foundBoards) => {
-          let boardList = [];
+          const boardList = [];
 
           foundBoards.forEach((board) => {
             boardList.push(board.toSimpleObject());

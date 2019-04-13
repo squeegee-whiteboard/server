@@ -1,4 +1,4 @@
-const Debug = require('debug');
+// const Debug = require('debug');
 // const Sequelize = require('sequelize');
 
 const express = require('express');
@@ -7,7 +7,7 @@ const router = express.Router();
 const passport = require('passport');
 
 
-const debug = Debug('server');
+// const debug = Debug('server');
 
 // const { Op } = Sequelize;
 
@@ -25,7 +25,7 @@ router.post('/create', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.name) {
       try {
-        User.findOne({
+        return User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
           Board.create({
@@ -58,15 +58,15 @@ router.patch('/name', (req, res, next) => {
         User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
-          foundUser.getBoards({ where: { board_url: req.body.board_id } }).then((associatedBoards) => {
-            if (associatedBoards.length > 0) {
-              associatedBoards[0].update({ board_name: req.body.name }).then(() => {
-                return res.json({ success: true, message: 'Board name updated.' });
-              });
-            } else {
-              return res.json({ success: false, message: 'Failed to update name.' });
-            }
-          });
+          foundUser.getBoards({ where: { board_url: req.body.board_id } })
+            .then((associatedBoards) => {
+              if (associatedBoards.length > 0) {
+                associatedBoards[0].update({ board_name: req.body.name })
+                  .then(() => res.json({ success: true, message: 'Board name updated.' }));
+              } else {
+                return res.json({ success: false, message: 'Failed to update name.' });
+              }
+            });
         });
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to update name.' });
@@ -87,9 +87,7 @@ router.put('/addMember', (req, res, next) => {
         }).then((foundUser) => {
           Board.findOne({ where: { board_url: req.body.board_id } }).then((foundBoard) => {
             foundUser.addBoard(foundBoard);
-          }).then(() => {
-            return res.json({ success: true, message: 'User added to board.' });
-          });
+          }).then(() => res.json({ success: true, message: 'User added to board.' }));
         });
       } catch (err2) {
         return res.json({ success: false, message: 'No board_id provided.' });
@@ -101,21 +99,21 @@ router.put('/addMember', (req, res, next) => {
 router.post('/delete', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) {
-      return res.json({ success: false, message: BAD_TOKEN_MESSAGE }); }
+      return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    }
     if (req.body.board_id) {
       try {
-        User.findOne({
+        return User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
-          foundUser.getBoards({ where: { board_url: req.body.board_id } }).then((associatedBoards) => {
-            if (associatedBoards.length > 0) {
-              associatedBoards[0].update({ is_enabled: false }).then(() => {
-                return res.json({ success: true, message: 'Board disabled.' });
-              });
-            } else {
+          foundUser.getBoards({ where: { board_url: req.body.board_id } })
+            .then((associatedBoards) => {
+              if (associatedBoards.length > 0) {
+                return associatedBoards[0].update({ is_enabled: false })
+                  .then(() => res.json({ success: true, message: 'Board disabled.' }));
+              }
               return res.json({ success: false, message: 'Failed to disable board.' });
-            }
-          });
+            });
         });
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to disable board.' });

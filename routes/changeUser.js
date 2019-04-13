@@ -27,11 +27,12 @@ router.get('/info', (req, res, next) => {
     try {
       User.findOne({
         where: { id: user.id },
-      }).then((foundUser) => {
-        return res.json({
-          success: true, username: foundUser.username, email: foundUser.email, message: 'User info successfully retrieved.',
-        });
-      });
+      }).then(foundUser => res.json({
+        success: true,
+        username: foundUser.username,
+        email: foundUser.email,
+        message: 'User info successfully retrieved.',
+      }));
     } catch (err2) {
       return res.json({ success: false, message: 'Failed to retrieve user info.' });
     }
@@ -78,20 +79,19 @@ router.patch('/email', (req, res, next) => {
         }).then((existingUser) => {
           if (existingUser) {
             return res.json({ success: false, msg: 'Someone else is using that email!' });
-          } else {
-            User.findOne({
-              where: { id: user.id },
-            }).then((foundUser) => {
-              foundUser.update({
-                email: req.body.email,
-              })
-                .then(() => {
-                  debug('email updated');
-
-                  return res.json({ success: true, message: 'Email updated.' });
-                });
-            });
           }
+          User.findOne({
+            where: { id: user.id },
+          }).then((foundUser) => {
+            foundUser.update({
+              email: req.body.email,
+            })
+              .then(() => {
+                debug('email updated');
+
+                return res.json({ success: true, message: 'Email updated.' });
+              });
+          });
         });
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to update email address.' });
@@ -114,7 +114,7 @@ router.patch('/password', (req, res, next) => {
             if (err2) {
               debug(err2);
               return res.json({ success: false, message: 'There was an error updating the password.' });
-            } else if (isMatch) {
+            } if (isMatch) {
               bcrypt.genSalt(saltRounds, (err3, salt) => {
                 bcrypt.hash(req.body.newPassword, salt, (err4, hashedPassword) => {
                   foundUser.update({ password: hashedPassword })
