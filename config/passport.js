@@ -18,6 +18,7 @@ module.exports = (passport) => {
       if (jwtPayload.id === undefined || jwtPayload.password === undefined) {
         return done(null, false, { message: BAD_TOKEN_MESSAGE });
       }
+
       return User.findOne({
         where: {
           id: jwtPayload.id,
@@ -25,7 +26,6 @@ module.exports = (passport) => {
         },
       }).then((foundUser) => {
         if (foundUser) {
-          // note the return is removed with passport JWT - add this return for passport local
           return done(null, foundUser);
         }
         return done(null, false, { message: BAD_TOKEN_MESSAGE });

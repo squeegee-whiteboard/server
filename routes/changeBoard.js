@@ -1,4 +1,4 @@
-// const Debug = require('debug');
+const Debug = require('debug');
 // const Sequelize = require('sequelize');
 
 const express = require('express');
@@ -7,7 +7,7 @@ const router = express.Router();
 const passport = require('passport');
 
 
-// const debug = Debug('server');
+const debug = Debug('server');
 
 // const { Op } = Sequelize;
 
@@ -37,7 +37,7 @@ router.post('/create', (req, res, next) => {
             return res.json({
               success: true,
               message: 'Board created.',
-              board_id: createdBoard.id,
+              board_id: createdBoard.board_url,
             });
           });
         });
@@ -58,7 +58,7 @@ router.patch('/name', (req, res, next) => {
         User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
-          foundUser.getBoards({ where: { id: req.body.board_id } }).then((associatedBoards) => {
+          foundUser.getBoards({ where: { board_url: req.body.board_id } }).then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               associatedBoards[0].update({ board_name: req.body.name }).then(() => {
                 return res.json({ success: true, message: 'Board name updated.' });
@@ -85,7 +85,7 @@ router.put('/addMember', (req, res, next) => {
         User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
-          Board.findOne({ where: { id: req.body.board_id } }).then((foundBoard) => {
+          Board.findOne({ where: { board_url: req.body.board_id } }).then((foundBoard) => {
             foundUser.addBoard(foundBoard);
           }).then(() => {
             return res.json({ success: true, message: 'User added to board.' });
@@ -98,15 +98,16 @@ router.put('/addMember', (req, res, next) => {
   })(req, res, next);
 });
 
-router.delete('/delete', (req, res, next) => {
+router.post('/delete', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (err || !user) {
+      return res.json({ success: false, message: BAD_TOKEN_MESSAGE }); }
     if (req.body.board_id) {
       try {
         User.findOne({
           where: { id: user.id },
         }).then((foundUser) => {
-          foundUser.getBoards({ where: { id: req.body.board_id } }).then((associatedBoards) => {
+          foundUser.getBoards({ where: { board_url: req.body.board_id } }).then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               associatedBoards[0].update({ is_enabled: false }).then(() => {
                 return res.json({ success: true, message: 'Board disabled.' });
