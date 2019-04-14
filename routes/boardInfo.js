@@ -40,7 +40,7 @@ router.get('/owned', (req, res, next) => {
           message: 'Successfully retrieved owned boards.',
           boards: boardList,
         });
-      });
+      }).catch(() => res.json({ success: false, message: 'Failed to retrieve owned boards.' }));
     } catch (err2) {
       return res.json({ success: false, message: 'Failed to retrieve owned boards.' });
     }
@@ -65,7 +65,7 @@ router.get('/member', (req, res, next) => {
             message: 'Successfully retrieved all boards.',
             boards: boardList,
           });
-        });
+        }).catch(() => res.json({ success: false, message: 'Failed to retrieve member boards.' }));
       }
 
       return user.getBoards({
@@ -81,7 +81,7 @@ router.get('/member', (req, res, next) => {
           message: 'Successfully retrieved member boards.',
           boards: boardList,
         });
-      });
+      }).catch(() => res.json({ success: false, message: 'Failed to retrieve member boards.' }));
     } catch (err2) {
       return res.json({ success: false, message: 'Failed to retrieve member boards.' });
     }
@@ -104,7 +104,7 @@ router.get('/isMember', (req, res, next) => {
           success: true,
           message: 'Membership found.',
           is_member: true,
-        }));
+        })).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
       }
 
       return user.getBoards({
@@ -125,9 +125,9 @@ router.get('/isMember', (req, res, next) => {
           message: 'Membership not found.',
           is_member: false,
         });
-      });
+      }).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
     } catch (err2) {
-      return res.json({ success: false, message: 'Failed to determine member status.' });
+      return res.json({ success: false, message: 'Failed to determine membership status.' });
     }
   })(req, res, next);
 });
