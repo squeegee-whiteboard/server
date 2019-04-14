@@ -1,3 +1,5 @@
+// Defines the socketio events for both the dashboard and individual whiteboard
+
 /* eslint-disable no-param-reassign */
 const Debug = require('debug');
 const io = require('socket.io')();

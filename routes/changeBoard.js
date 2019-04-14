@@ -1,25 +1,19 @@
-// const Debug = require('debug');
-// const Sequelize = require('sequelize');
-
+/*
+Defines the REST API endpoints used for changing boards
+See README for detailed documentation of each endpoint
+*/
 const express = require('express');
+const passport = require('passport');
+const models = require('../models');
 
 const router = express.Router();
-const passport = require('passport');
-
-
-// const debug = Debug('server');
-
-// const { Op } = Sequelize;
-
-// const jwt = require('jsonwebtoken');
-const models = require('../models');
-// const jwtSecret = require('../config/jwtConfig');
-// const { saltRounds } = require('../config/bcryptConfig');
-
 const { Board } = models;
-
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
+
+// POST - /changeBoard/create
+// Creates a new whiteboard
+// See README for detailed documentation
 router.post('/create', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -43,6 +37,10 @@ router.post('/create', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// PATCH - /changeBoard/name
+// Changes the name of a whiteboard
+// See README for detailed documentation
 router.patch('/name', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -73,6 +71,10 @@ router.patch('/name', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// PUT - /changeBoard/addMember
+// Adds a new user to the whiteboard
+// See README for detailed documentation
 router.put('/addMember', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -96,6 +98,10 @@ router.put('/addMember', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// POST - /changeBoard/delete
+// Disabled (effectively deletes) a whiteboard
+// See README for detailed documentation
 router.post('/delete', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) {

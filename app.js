@@ -1,4 +1,6 @@
-/* eslint-disable no-param-reassign */
+/*
+Main entry point for the squeegee server
+*/
 const express = require('express');
 const Cors = require('cors');
 const Debug = require('debug');
@@ -13,7 +15,6 @@ const changeUserRouter = require('./routes/changeUser');
 const authRouter = require('./routes/auth');
 const changeBoardRouter = require('./routes/changeBoard');
 const boardInfoRouter = require('./routes/boardInfo');
-// const indexRouter = require('./routes/index');
 
 const app = express();
 const debug = Debug('server');
@@ -27,7 +28,7 @@ app.use(bodyParser.json());
 app.use(passport.initialize());
 app.use(morgan('dev'));
 
-// app.use('/', indexRouter);
+// set up routers
 app.use('/changeUser', changeUserRouter);
 app.use('/auth', authRouter);
 app.use('/changeBoard', changeBoardRouter);

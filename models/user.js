@@ -1,3 +1,15 @@
+/* USER
+Represents a user
+Attributes:
+  username: The name of the user
+  email: The email the user uses to log in
+  password: the user's password (hashed and salted)
+  is_admin: whether or not the user is an admin
+
+Associations:
+  owned_boards: Boards the user has created 1:N (User:Board)
+  board_members: Boards the user is a member of, M:N (User:Board)
+*/
 const PASSWORD_HASH_LENGTH = 60;
 
 module.exports = (sequelize, DataTypes) => {
@@ -27,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
     },
   }, {});
+
   User.associate = (models) => {
     // associations can be defined here
     User.hasMany(models.Board, {

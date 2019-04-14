@@ -1,25 +1,19 @@
-// const Debug = require('debug');
-// const Sequelize = require('sequelize');
-
+/*
+Defines the REST API endpoints used for getting board information
+See README for detailed documentation of each endpoint
+*/
 const express = require('express');
+const passport = require('passport');
+const models = require('../models');
 
 const router = express.Router();
-const passport = require('passport');
-
-
-// const debug = Debug('server');
-
-// const { Op } = Sequelize;
-
-// const jwt = require('jsonwebtoken');
-const models = require('../models');
-// const jwtSecret = require('../config/jwtConfig');
-// const { saltRounds } = require('../config/bcryptConfig');
-
 const { Board } = models;
-
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
+
+// GET - /boardInfo/owned
+// Gets the list of boards owned by the user
+// See README for detailed documentation
 router.get('/owned', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -47,6 +41,10 @@ router.get('/owned', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// GET - /boardInfo/member
+// Gets the list of boards the user is a member of
+// See README for detailed documentation
 router.get('/member', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -88,8 +86,10 @@ router.get('/member', (req, res, next) => {
   })(req, res, next);
 });
 
-// GET /boardInfo/isMember endpoint
+
+// GET - /boardInfo/isMember
 // Returns whether or not the requesting user is a member of the specified board
+// See README for detailed documentation
 router.get('/isMember', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });

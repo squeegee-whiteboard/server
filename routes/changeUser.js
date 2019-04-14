@@ -1,24 +1,27 @@
+/*
+Defines the REST API endpoints used for changing details about the user
+See README for detailed documentation of each endpoint
+*/
 const Debug = require('debug');
 const Sequelize = require('sequelize');
 const express = require('express');
-
-const router = express.Router();
-const passport = require('passport');
-
-const debug = Debug('server');
-
-const { Op } = Sequelize;
-
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const passport = require('passport');
 const models = require('../models');
 const jwtSecret = require('../config/jwtConfig');
 const { saltRounds } = require('../config/bcryptConfig');
 
+const router = express.Router();
+const debug = Debug('server');
+const { Op } = Sequelize;
 const { User } = models;
-
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
+
+// GET - /changeUser/info
+// Gets the information stored about the user from the server
+// See README for detailed documentation
 router.get('/info', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -35,6 +38,10 @@ router.get('/info', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// PATCH - /changeUser/username
+// Changes the user's name
+// See README for detailed documentation
 router.patch('/username', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -55,6 +62,10 @@ router.patch('/username', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// PATCH - /changeUser/email
+// Change's the user's email
+// See README for detailed documentation
 router.patch('/email', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
@@ -86,6 +97,10 @@ router.patch('/email', (req, res, next) => {
   })(req, res, next);
 });
 
+
+// PATCH - /changeUser/password
+// Change's the user's password
+// See README for detailed documentation
 router.patch('/password', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
