@@ -16,7 +16,7 @@ const models = require('../models');
 // const jwtSecret = require('../config/jwtConfig');
 // const { saltRounds } = require('../config/bcryptConfig');
 
-const { User, Board } = models;
+const { Board } = models;
 
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
@@ -52,7 +52,9 @@ router.get('/member', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
       if (user.is_admin) {
-        return Board.findAll().then((foundBoards) => {
+        return Board.findAll({
+          where: { is_enabled: true },
+        }).then((foundBoards) => {
           const boardList = [];
 
           foundBoards.forEach((board) => {
@@ -66,22 +68,18 @@ router.get('/member', (req, res, next) => {
         });
       }
 
-      return User.findOne({
-        where: { id: user.id },
-      }).then((foundUser) => {
-        foundUser.getBoards({
-          where: { is_enabled: true },
-        }).then((foundBoards) => {
-          const boardList = [];
+      return user.getBoards({
+        where: { is_enabled: true },
+      }).then((foundBoards) => {
+        const boardList = [];
 
-          foundBoards.forEach((board) => {
-            boardList.push(board.toSimpleObject());
-          });
-          return res.json({
-            success: true,
-            message: 'Successfully retrieved member boards.',
-            boards: boardList,
-          });
+        foundBoards.forEach((board) => {
+          boardList.push(board.toSimpleObject());
+        });
+        return res.json({
+          success: true,
+          message: 'Successfully retrieved member boards.',
+          boards: boardList,
         });
       });
     } catch (err2) {
@@ -97,24 +95,23 @@ router.get('/isMember', (req, res, next) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
       if (user.is_admin) {
-        return Board.findAll({
-          where: { board_url: req.body.board_id },
-        }).then((foundBoards) => {
-          if (foundBoards.length >= 1) {
-            return res.json({
-              success: true,
-              message: 'Membership found.',
-              is_member: true,
-            });
-          }
-          return res.json({
-            success: false,
-            message: 'Board does not exist.',
-          });
-        });
+        return Board.findOne({
+          where: {
+            board_url: req.body.board_id,
+            is_enabled: true,
+          },
+        }).then(() => res.json({
+          success: true,
+          message: 'Membership found.',
+          is_member: true,
+        }));
       }
+
       return user.getBoards({
-        where: { board_url: req.body.board_id },
+        where: {
+          board_url: req.body.board_id,
+          is_enabled: true,
+        },
       }).then((foundBoard) => {
         if (foundBoard.length >= 1) {
           return res.json({
@@ -130,7 +127,7 @@ router.get('/isMember', (req, res, next) => {
         });
       });
     } catch (err2) {
-      return res.json({ success: false, message: 'Failed to determine member status boards.' });
+      return res.json({ success: false, message: 'Failed to determine member status.' });
     }
   })(req, res, next);
 });

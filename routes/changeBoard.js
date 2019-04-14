@@ -51,6 +51,11 @@ router.patch('/name', (req, res, next) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.name && req.body.board_id) {
       try {
+        if (user.is_admin) {
+          return Board.findOne({ where: { board_url: req.body.board_id } })
+            .then(foundBoard => foundBoard.update({ board_name: req.body.name })
+              .then(() => res.json({ success: true, message: 'Board name updated.' })));
+        }
         return user.getBoards({ where: { board_url: req.body.board_id } })
           .then((associatedBoards) => {
             if (associatedBoards.length > 0) {
@@ -73,11 +78,15 @@ router.put('/addMember', (req, res, next) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     if (req.body.board_id) {
       try {
-        return Board.findOne({ where: { board_url: req.body.board_id } })
-          .then(foundBoard => user.addBoard(foundBoard))
+        return Board.findOne({
+          where: {
+            board_url: req.body.board_id,
+            is_enabled: true,
+          },
+        }).then(foundBoard => user.addBoard(foundBoard))
           .then(() => res.json({ success: true, message: 'User added to board.' }));
       } catch (err2) {
-        return res.json({ success: false, message: 'No board_id provided.' });
+        return res.json({ success: false, message: 'Failed to add user to board.' });
       }
     } else {
       return res.json({ success: false, message: 'No board_id provided.' });
@@ -92,6 +101,11 @@ router.post('/delete', (req, res, next) => {
     }
     if (req.body.board_id) {
       try {
+        if (user.is_admin) {
+          return Board.findOne({ where: { board_url: req.body.board_id } })
+            .then(foundBoard => foundBoard.update({ is_enabled: false })
+              .then(() => res.json({ success: true, message: 'Board disabled.' })));
+        }
         return user.getBoards({ where: { board_url: req.body.board_id } })
           .then((associatedBoards) => {
             if (associatedBoards.length > 0) {
