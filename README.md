@@ -56,6 +56,7 @@ Currently uses port `3000` by default.
 
 * GET - /boardInfo/owned
 * GET - /boardInfo/member
+* GET - /boardInfo/isMember
 
 # Normal Endpoints
 These endpoints don't require an auth token, but will return one.
@@ -436,7 +437,7 @@ JSON object in the form:
 {
     "success": true,
     "message": <success message>,
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
@@ -444,7 +445,7 @@ Ex:
 {
     "success": true,
     "message": "Board created."
-    "board_id": 1
+    "board_id": "dhohohi32y948234"
 }
 ```
 
@@ -475,14 +476,14 @@ JSON object in the form:
 ```javascript
 {
     "name": <board name>,
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
 ```javascript
 {
     "name": "ex name",
-    "board_id": 1
+    "board_id": "askjdhqiuhiuqoij3920"
 }
 ```
 
@@ -528,13 +529,12 @@ Ex: `localhost:3000/changeBoard/addMember'
 JSON object in the form:
 ```javascript
 {
-    "board_id": <the boards identifier (may be int or hash)>
-}
+    "board_id": <base64 board identifier string>
 ```
 Ex:
 ```javascript
 {
-	"board_id": 1
+	"board_id": "iuhd929823h9dh2"
 }
 ```
 
@@ -569,24 +569,24 @@ JSON object in the form:
 }
 ```
 
-## DELETE - /changeBoard/delete
+## POST - /changeBoard/delete
 Creates a board and adds the creating user as an owner.
 
 ### Input
-DELETE request to the endpoint url.
+POST request to the endpoint url.
 
 Ex: `localhost:3000/changeBoard/delete'
 
 JSON object in the form:
 ```javascript
 {
-    "board_id": <the boards identifier (may be int or hash)>
+    "board_id": <base64 board identifier string>
 }
 ```
 Ex:
 ```javascript
 {
-	"board_id": 1
+	"board_id": "kjshf2982u39823u"
 }
 ```
 
@@ -638,12 +638,8 @@ JSON object in the form:
     "message": <success message>,
     "boards": [
         {
-            "id": <board identifier (may be int or hash)>,
+            "board_id": <base64 board identifier string>,
             "board_name": <board name>,
-            "state": <board state>,
-            "is_enabled": <whether board has been 'deleted'>,
-            "owner_id": <id of board creator>,
-            ...
         },
         ...
     ]
@@ -656,32 +652,12 @@ Ex:
     "message": "Successfully retrieved boards.",
     "boards": [
         {
-            "id": 1,
+            "board_id": "sdaksjka2y92723h2dhui2d",
             "board_name": "AwesomeBoard",
-            "state": [],
-            "is_enabled": false,
-            "createdAt": "2019-04-09T17:20:33.791Z",
-            "updatedAt": "2019-04-09T17:56:04.529Z",
-            "owner_id": 1,
-            "board_members": {
-                "createdAt": "2019-04-09T17:20:33.823Z",
-                "updatedAt": "2019-04-09T17:20:33.823Z",
-                "board_id": 1,
-                "user_id": 1
         },
         {
-             "id": 2,
+            "board_id": "dasdajdajkk28832",
             "board_name": "secondBoard",
-            "state": [],
-            "is_enabled": false,
-            "createdAt": "2019-04-09T17:28:13.005Z",
-            "updatedAt": "2019-04-09T17:56:01.609Z",
-            "owner_id": 2,
-            "board_members": {
-                "createdAt": "2019-04-09T17:32:06.260Z",
-                "updatedAt": "2019-04-09T17:32:06.260Z",
-                "board_id": 2,
-                "user_id": 1
         }
     ]
 }
@@ -719,12 +695,8 @@ JSON object in the form:
     "message": <success message>,
     "boards": [
         {
-            "id": <board identifier (may be int or hash)>,
+            "board_id": <base64 board identifier string>,
             "board_name": <board name>,
-            "state": <board state>,
-            "is_enabled": <whether board has been 'deleted'>,
-            "owner_id": <id of board creator>,
-            ...
         },
         ...
     ]
@@ -737,28 +709,16 @@ Ex:
     "message": "Successfully retrieved boards.",
     "boards": [
        {
-            "id": 1,
+            "board_id": "asdsadaaggasdasd",
             "board_name": "AwesomeBoard",
-            "state": [],
-            "is_enabled": false,
-            "createdAt": "2019-04-09T17:20:33.791Z",
-            "updatedAt": "2019-04-09T17:56:04.529Z",
-            "owner_id": 1,
-            "board_members": {
-                "createdAt": "2019-04-09T17:20:33.823Z",
-                "updatedAt": "2019-04-09T17:20:33.823Z",
-                "board_id": 1,
-                "user_id": 1
         },
         {
-            "id": 2,
+            "board_id": "safaf4f28282",
             "board_name": "secondBoard",
-            ...
         },
 	{
-            "id": 3,
+            "board_id": "ferf343364436346",
             "board_name": "Someone Else's Board",
-            ...
         }
     ]
 }
@@ -776,5 +736,59 @@ JSON object in the form:
 {
     "success": false,
     "message": "Failed to retrieve member boards"
+}
+```
+
+## GET - /boardInfo/isMember
+Returns if a user is a member of a board or not.
+
+### Input
+GET request to the endpoint url.
+
+Ex: `localhost:3000/boardInfo/isMember`
+
+JSON object in the form:
+```javascript
+{
+    "board_id": <base64 board identifier string>
+}
+```
+Ex:
+```javascript
+{
+    "board_id": "hd292898h239hd2"
+}
+```
+
+### Output
+JSON object in the form:
+```javascript
+{
+    "success": true,
+    "message": <success message>,
+    "is_member": <true/false>
+}
+```
+Ex:
+```javascript
+{
+    "success": true,
+    "message": "Member found."
+    "is_member": true
+}
+```
+
+### On Error
+JSON object in the form:
+```javascript
+{
+    "success": false,
+    "message": <failure message>
+}
+```
+```javascript
+{
+    "success": false,
+    "message": "Could not access API server."
 }
 ```

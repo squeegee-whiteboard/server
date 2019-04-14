@@ -16,7 +16,7 @@ const models = require('../models');
 // const jwtSecret = require('../config/jwtConfig');
 // const { saltRounds } = require('../config/bcryptConfig');
 
-const { User, Board } = models;
+const { Board } = models;
 
 const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 
@@ -24,11 +24,21 @@ router.get('/owned', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
-      Board.findAll({ where: { owner_id: user.id } }).then((foundBoards) => {
+      return Board.findAll({
+        where: {
+          owner_id: user.id,
+          is_enabled: true,
+        },
+      }).then((foundBoards) => {
+        const boardList = [];
+
+        foundBoards.forEach((board) => {
+          boardList.push(board.toSimpleObject());
+        });
         return res.json({
           success: true,
           message: 'Successfully retrieved owned boards.',
-          boards: foundBoards,
+          boards: boardList,
         });
       });
     } catch (err2) {
@@ -41,19 +51,83 @@ router.get('/member', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
     try {
-      User.findOne({
-        where: { id: user.id },
-      }).then((foundUser) => {
-        foundUser.getBoards().then((foundBoards) => {
+      if (user.is_admin) {
+        return Board.findAll({
+          where: { is_enabled: true },
+        }).then((foundBoards) => {
+          const boardList = [];
+
+          foundBoards.forEach((board) => {
+            boardList.push(board.toSimpleObject());
+          });
           return res.json({
             success: true,
-            message: 'Successfully retrieved owned boards.',
-            boards: foundBoards,
+            message: 'Successfully retrieved all boards.',
+            boards: boardList,
           });
+        });
+      }
+
+      return user.getBoards({
+        where: { is_enabled: true },
+      }).then((foundBoards) => {
+        const boardList = [];
+
+        foundBoards.forEach((board) => {
+          boardList.push(board.toSimpleObject());
+        });
+        return res.json({
+          success: true,
+          message: 'Successfully retrieved member boards.',
+          boards: boardList,
         });
       });
     } catch (err2) {
-      return res.json({ success: false, message: 'Failed to retrieve owned boards.' });
+      return res.json({ success: false, message: 'Failed to retrieve member boards.' });
+    }
+  })(req, res, next);
+});
+
+// GET /boardInfo/isMember endpoint
+// Returns whether or not the requesting user is a member of the specified board
+router.get('/isMember', (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (err, user) => {
+    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    try {
+      if (user.is_admin) {
+        return Board.findOne({
+          where: {
+            board_url: req.body.board_id,
+            is_enabled: true,
+          },
+        }).then(() => res.json({
+          success: true,
+          message: 'Membership found.',
+          is_member: true,
+        }));
+      }
+
+      return user.getBoards({
+        where: {
+          board_url: req.body.board_id,
+          is_enabled: true,
+        },
+      }).then((foundBoard) => {
+        if (foundBoard.length >= 1) {
+          return res.json({
+            success: true,
+            message: 'Membership found.',
+            is_member: true,
+          });
+        }
+        return res.json({
+          success: true,
+          message: 'Membership not found.',
+          is_member: false,
+        });
+      });
+    } catch (err2) {
+      return res.json({ success: false, message: 'Failed to determine member status.' });
     }
   })(req, res, next);
 });
