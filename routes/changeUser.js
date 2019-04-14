@@ -45,7 +45,7 @@ router.patch('/username', (req, res, next) => {
         }).then(() => {
           debug('Username updated');
           return res.json({ success: true, message: 'Username updated.' });
-        });
+        }).catch(() => res.json({ success: false, message: 'Failed to change username.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to change username.' });
       }
@@ -75,8 +75,8 @@ router.patch('/email', (req, res, next) => {
           }).then(() => {
             debug('email updated');
             return res.json({ success: true, message: 'Email updated.' });
-          });
-        });
+          }).catch(() => res.json({ success: false, message: 'Email invalid.' }));
+        }).catch(() => res.json({ success: false, message: 'Failed to update email address.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to update email address.' });
       }
@@ -114,7 +114,7 @@ router.patch('/password', (req, res, next) => {
             });
           }
           return res.json({ success: false, message: 'Wrong old password.' });
-        });
+        }).catch(() => res.json({ success: false, message: 'There was an error updating the password.' }));
       } catch (err5) {
         return res.json({ success: false, message: 'There was an error updating the password.' });
       }

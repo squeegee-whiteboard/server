@@ -29,14 +29,11 @@ router.post('/create', (req, res, next) => {
           board_name: req.body.name,
           is_enabled: true,
           owner_id: user.id,
-        }).then((createdBoard) => {
-          user.addBoard(createdBoard);
-          return res.json({
-            success: true,
-            message: 'Board created.',
-            board_id: createdBoard.board_url,
-          });
-        });
+        }).then(createdBoard => user.addBoard(createdBoard).then(() => res.json({
+          success: true,
+          message: 'Board created.',
+          board_id: createdBoard.board_url,
+        })).catch(() => res.json({ success: false, message: 'Failed to create board.' })));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to create board.' });
       }
@@ -54,16 +51,19 @@ router.patch('/name', (req, res, next) => {
         if (user.is_admin) {
           return Board.findOne({ where: { board_url: req.body.board_id } })
             .then(foundBoard => foundBoard.update({ board_name: req.body.name })
-              .then(() => res.json({ success: true, message: 'Board name updated.' })));
+              .then(() => res.json({ success: true, message: 'Board name updated.' }))
+              .catch(() => res.json({ success: false, message: 'Failed to update name.' })))
+            .catch(() => res.json({ success: false, message: 'Failed to update name.' }));
         }
         return user.getBoards({ where: { board_url: req.body.board_id } })
           .then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               return associatedBoards[0].update({ board_name: req.body.name })
-                .then(() => res.json({ success: true, message: 'Board name updated.' }));
+                .then(() => res.json({ success: true, message: 'Board name updated.' }))
+                .catch(() => res.json({ success: false, message: 'Failed to update name.' }));
             }
             return res.json({ success: false, message: 'Failed to update name.' });
-          });
+          }).catch(() => res.json({ success: false, message: 'Failed to update name.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to update name.' });
       }
@@ -83,8 +83,10 @@ router.put('/addMember', (req, res, next) => {
             board_url: req.body.board_id,
             is_enabled: true,
           },
-        }).then(foundBoard => user.addBoard(foundBoard))
-          .then(() => res.json({ success: true, message: 'User added to board.' }));
+        }).then(foundBoard => user.addBoard(foundBoard)
+          .then(() => res.json({ success: true, message: 'User added to board.' }))
+          .catch(() => res.json({ success: false, message: 'Failed to add user to board.' })))
+          .catch(() => res.json({ success: false, message: 'Failed to add user to board.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to add user to board.' });
       }
@@ -104,16 +106,19 @@ router.post('/delete', (req, res, next) => {
         if (user.is_admin) {
           return Board.findOne({ where: { board_url: req.body.board_id } })
             .then(foundBoard => foundBoard.update({ is_enabled: false })
-              .then(() => res.json({ success: true, message: 'Board disabled.' })));
+              .then(() => res.json({ success: true, message: 'Board disabled.' }))
+              .catch(() => res.json({ success: false, message: 'Failed to disable board.' })))
+            .catch(() => res.json({ success: false, message: 'Failed to disable board.' }));
         }
         return user.getBoards({ where: { board_url: req.body.board_id } })
           .then((associatedBoards) => {
             if (associatedBoards.length > 0) {
               return associatedBoards[0].update({ is_enabled: false })
-                .then(() => res.json({ success: true, message: 'Board disabled.' }));
+                .then(() => res.json({ success: true, message: 'Board disabled.' }))
+                .catch(() => res.json({ success: false, message: 'Failed to disable board.' }));
             }
             return res.json({ success: false, message: 'Failed to disable board.' });
-          });
+          }).catch(() => res.json({ success: false, message: 'Failed to disable board.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to disable board.' });
       }

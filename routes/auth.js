@@ -29,24 +29,22 @@ router.post('/register', (req, res) => {
     }
 
     return bcrypt.genSalt(saltRounds, (err, salt) => {
-      bcrypt.hash(req.body.password, salt, (err2, hashedPassword) => {
-        User.create({
-          username: req.body.username,
-          email: req.body.email,
-          password: hashedPassword,
-          is_admin: false,
-        }).then((createdUser) => {
-          const token = jwt.sign({
-            id: createdUser.id,
-            password: createdUser.password,
-          }, jwtSecret.secret);
-          return res.json({
-            success: true,
-            token: `JWT ${token}`,
-            message: 'User successfully created.',
-          });
-        });
-      });
+      bcrypt.hash(req.body.password, salt, (err2, hashedPassword) => User.create({
+        username: req.body.username,
+        email: req.body.email,
+        password: hashedPassword,
+        is_admin: false,
+      }).then((createdUser) => {
+        const token = jwt.sign({
+          id: createdUser.id,
+          password: createdUser.password,
+        }, jwtSecret.secret);
+        return res.json({
+          success: true,
+          token: `JWT ${token}`,
+          message: 'User successfully created.',
+        }).catch(() => res.json({ success: false, message: 'Email invalid.' }));
+      }));
     });
   });
 }); // End of traditional JS staircase of doom.
