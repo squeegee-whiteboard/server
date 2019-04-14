@@ -12,6 +12,10 @@ const debug = Debug('server');
 // Disconnect when leaving the dash
 const boardSocket = io.of('/board');
 
+// A board state to store the board ID and number of online users for each board currently
+// being accessed
+const boardStates = {};
+
 boardSocket.on('connection', (socket) => {
   debug('connected to board socket');
 
@@ -25,10 +29,19 @@ boardSocket.on('connection', (socket) => {
     debug(`Set board id ${socket.boardId}`);
   });
 
-  // debug, but shows show to emit to everyone in the room
-  socket.on('check', () => {
-    debug(socket.boardId);
-    socket.broadcast.to(socket.boardId).emit('newevent');
+  socket.on('new_path', (pathJSON) => {
+    debug('Got new path');
+    socket.broadcast.to(socket.boardId).emit('new_path', pathJSON);
+  });
+
+  socket.on('removed_items', (pathJSONList) => {
+    debug('Got new removed path list');
+    socket.broadcast.to(socket.boardId).emit('removed_paths', pathJSONList);
+  });
+
+  socket.on('disconnect', () => {
+    // TODO: disconnect event to persist board state to database
+    debug(`Got disconnect from ${socket.boardId}`);
   });
 });
 
