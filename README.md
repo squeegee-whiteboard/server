@@ -467,6 +467,8 @@ JSON object in the form:
 ## PATCH - /changeBoard/name
 Creates a board and adds the creating user as an owner.
 
+Any member or admin can change a board name.
+
 ### Input
 PATCH request to the endpoint url.
 
@@ -571,6 +573,8 @@ JSON object in the form:
 
 ## POST - /changeBoard/delete
 Creates a board and adds the creating user as an owner.
+
+Any member or admin can delete a board.
 
 ### Input
 POST request to the endpoint url.
@@ -682,6 +686,8 @@ JSON object in the form:
 Gets the list of boards the user is a member of.
 If user is not a member of any boards, return empty list.
 
+Admin can see all boards.
+
 ### Input
 GET request to the endpoint url.
 
@@ -741,6 +747,8 @@ JSON object in the form:
 
 ## GET - /boardInfo/isMember
 Returns if a user is a member of a board or not.
+
+Admin is considered member of all boards
 
 ### Input
 GET request to the endpoint url.

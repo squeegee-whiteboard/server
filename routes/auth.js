@@ -1,3 +1,7 @@
+/*
+Defines the REST API endpoints used for authentication
+See README for detailed documentation of each endpoint
+*/
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const router = require('express').Router();
@@ -5,22 +9,20 @@ const bcrypt = require('bcrypt');
 const models = require('../models');
 const jwtSecret = require('../config/jwtConfig');
 
-
 const { User } = models;
-
 require('../config/passport')(passport);
-
 const { saltRounds } = require('../config/bcryptConfig');
 
 
+// POST - /auth/register
+// Registers the user
+// See README for detailed documentation
 router.post('/register', (req, res) => {
   if (!req.body.username || !req.body.password || !req.body.email) {
     return res.json({ success: false, msg: 'Please pass username, email, and password.' });
-    // console.log(req.body);
   }
   return User.findOne({
     where: {
-      // $or: [{username: req.body.username}, {email: req.body.email}]
       email: req.body.email,
     },
   }).then((foundUser) => {
@@ -47,8 +49,12 @@ router.post('/register', (req, res) => {
       }));
     });
   });
-}); // End of traditional JS staircase of doom.
+});
 
+
+// POST - /auth/login
+// logs the user in
+// See README for detailed documentation
 // Login function taken from https://medium.com/front-end-weekly/learn-using-jwt-with-passport-authentication-9761539c4314
 router.post('/login', (req, res) => {
   passport.authenticate('local', { session: false }, (err, user) => {

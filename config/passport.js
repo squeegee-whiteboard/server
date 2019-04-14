@@ -1,3 +1,4 @@
+// Passport authentication strategies used by the system
 const JwtStrategy = require('passport-jwt').Strategy;
 const LocalStrategy = require('passport-local').Strategy;
 const { ExtractJwt } = require('passport-jwt');
@@ -13,6 +14,9 @@ const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 const BAD_LOGIN_MESSAGE = 'Incorrect email or password.';
 
 module.exports = (passport) => {
+  // JSON Web Token
+  // Defines the auth strategy using webtokens stored on the client
+  // Used for authenticating REST API endpoints
   passport.use('jwt', new JwtStrategy({ jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme('JWT'), secretOrKey: jwtSecret.secret }, ((jwtPayload, done) => {
     try {
       if (jwtPayload.id === undefined || jwtPayload.password === undefined) {
@@ -35,6 +39,9 @@ module.exports = (passport) => {
     }
   })));
 
+  // Local
+  // Defines the auth strategy using email and password
+  // Used for initial login
   passport.use('local', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
