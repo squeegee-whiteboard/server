@@ -3,9 +3,10 @@
 /* eslint-disable no-param-reassign */
 const Debug = require('debug');
 const io = require('socket.io')();
+const { Project } = require('paper-jsdom');
+const { newPath, removePaths } = require('./boardTools');
 
 const debug = Debug('server');
-
 
 // Socket whiteboard connections
 // Connect when arriving to the board
@@ -17,31 +18,58 @@ const boardSocket = io.of('/board');
 const boardStates = {};
 
 boardSocket.on('connection', (socket) => {
-  debug('connected to board socket');
-
   // Sets the boardId the user is connected to
   // User will send this immediately upon connection
-  // sets the board id in the socket session
-  // and joins/create a room for that id
   socket.on('boardId', (boardId) => {
+    // Join the socket room for the board
     socket.join(boardId);
+
+    // Set the board ID for the current socket
     socket.boardId = boardId;
-    debug(`Set board id ${socket.boardId}`);
+
+    // Check if the board exists in boardStates already
+    if (boardId in boardStates) {
+      boardStates[boardId].userCount += 1;
+
+      debug(`sending existing board dump ${socket.boardId}`);
+      debug(`New user, current board users: ${boardStates[boardId].userCount}`);
+      socket.emit('board_dump', boardStates[boardId].board.exportJSON());
+    } else {
+      // If the board doesn't exist in board states, add it
+      boardStates[boardId] = {
+        userCount: 1,
+        board: new Project(),
+      };
+
+      debug(`new board ${socket.boardId}`);
+
+      // TODO: also load board from DB
+    }
   });
 
   socket.on('new_path', (pathJSON) => {
     debug('Got new path');
     socket.broadcast.to(socket.boardId).emit('new_path', pathJSON);
+
+    const paperObject = boardStates[socket.boardId].board;
+    newPath(paperObject, pathJSON);
   });
 
-  socket.on('removed_items', (pathJSONList) => {
+  socket.on('removed_paths', (pathJSONList) => {
     debug('Got new removed path list');
     socket.broadcast.to(socket.boardId).emit('removed_paths', pathJSONList);
+
+    const paperObject = boardStates[socket.boardId].board;
+    removePaths(paperObject, pathJSONList);
   });
 
   socket.on('disconnect', () => {
-    // TODO: disconnect event to persist board state to database
     debug(`Got disconnect from ${socket.boardId}`);
+    boardStates[socket.boardId].userCount -= 1;
+
+    if (boardStates[socket.boardId].usercount <= 0) {
+      // TODO: save the board and delete the object here
+    }
   });
 });
 
