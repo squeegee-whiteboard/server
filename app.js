@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const express = require('express');
 const Cors = require('cors');
 const Debug = require('debug');
@@ -5,6 +6,7 @@ const http = require('http');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const io = require('./socketio/io');
 const models = require('./models');
 
 const changeUserRouter = require('./routes/changeUser');
@@ -43,7 +45,7 @@ app.set('port', port);
 
 // Create HTTP server.
 const server = http.createServer(app);
-
+io.attach(server);
 
 // Sync models with the database
 models.sequelize.sync().then(() => {
