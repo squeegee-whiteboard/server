@@ -108,9 +108,9 @@ dashSocket.on('connection', (socket) => {
   // Indicates something about a board was changed
   // User sends when they change the name, create, or delete a board
   // Sends a refreshBoards event to all users, prompts them to reload their dashboard
-  socket.on('changeBoard', () => {
-    debug('changeBoard');
-    dashSocket.emit('refreshBoards');
+  socket.on('change_board', () => {
+    debug('change_board');
+    dashSocket.broadcast.emit('refresh_boards');
   });
 });
 
