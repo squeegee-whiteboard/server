@@ -16,28 +16,24 @@ const BAD_TOKEN_MESSAGE = 'Invalid auth token.';
 // See README for detailed documentation
 router.get('/owned', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
-    try {
-      return Board.findAll({
-        where: {
-          owner_id: user.id,
-          is_enabled: true,
-        },
-      }).then((foundBoards) => {
-        const boardList = [];
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    return Board.findAll({
+      where: {
+        owner_id: user.id,
+        is_enabled: true,
+      },
+    }).then((foundBoards) => {
+      const boardList = [];
 
-        foundBoards.forEach((board) => {
-          boardList.push(board.toSimpleObject());
-        });
-        return res.json({
-          success: true,
-          message: 'Successfully retrieved owned boards.',
-          boards: boardList,
-        });
-      }).catch(() => res.json({ success: false, message: 'Failed to retrieve owned boards.' }));
-    } catch (err2) {
-      return res.json({ success: false, message: 'Failed to retrieve owned boards.' });
-    }
+      foundBoards.forEach((board) => {
+        boardList.push(board.toSimpleObject());
+      });
+      return res.json({
+        success: true,
+        message: 'Successfully retrieved owned boards.',
+        boards: boardList,
+      });
+    }).catch(() => res.json({ success: false, message: 'Failed to retrieve owned boards.' }));
   })(req, res, next);
 });
 
@@ -48,25 +44,8 @@ router.get('/owned', (req, res, next) => {
 router.get('/member', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
     if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
-    try {
-      if (user.is_admin) {
-        return Board.findAll({
-          where: { is_enabled: true },
-        }).then((foundBoards) => {
-          const boardList = [];
-
-          foundBoards.forEach((board) => {
-            boardList.push(board.toSimpleObject());
-          });
-          return res.json({
-            success: true,
-            message: 'Successfully retrieved all boards.',
-            boards: boardList,
-          });
-        }).catch(() => res.json({ success: false, message: 'Failed to retrieve member boards.' }));
-      }
-
-      return user.getBoards({
+    if (user.is_admin) {
+      return Board.findAll({
         where: { is_enabled: true },
       }).then((foundBoards) => {
         const boardList = [];
@@ -76,13 +55,26 @@ router.get('/member', (req, res, next) => {
         });
         return res.json({
           success: true,
-          message: 'Successfully retrieved member boards.',
+          message: 'Successfully retrieved all boards.',
           boards: boardList,
         });
       }).catch(() => res.json({ success: false, message: 'Failed to retrieve member boards.' }));
-    } catch (err2) {
-      return res.json({ success: false, message: 'Failed to retrieve member boards.' });
     }
+
+    return user.getBoards({
+      where: { is_enabled: true },
+    }).then((foundBoards) => {
+      const boardList = [];
+
+      foundBoards.forEach((board) => {
+        boardList.push(board.toSimpleObject());
+      });
+      return res.json({
+        success: true,
+        message: 'Successfully retrieved member boards.',
+        boards: boardList,
+      });
+    }).catch(() => res.json({ success: false, message: 'Failed to retrieve member boards.' }));
   })(req, res, next);
 });
 
@@ -92,43 +84,39 @@ router.get('/member', (req, res, next) => {
 // See README for detailed documentation
 router.get('/isMember', (req, res, next) => {
   passport.authenticate('jwt', { session: false }, (err, user) => {
-    if (err || !user) res.json({ success: false, message: BAD_TOKEN_MESSAGE });
-    try {
-      if (user.is_admin) {
-        return Board.findOne({
-          where: {
-            board_url: req.body.board_id,
-            is_enabled: true,
-          },
-        }).then(() => res.json({
+    if (err || !user) return res.json({ success: false, message: BAD_TOKEN_MESSAGE });
+    if (user.is_admin) {
+      return Board.findOne({
+        where: {
+          board_url: req.query.board_id,
+          is_enabled: true,
+        },
+      }).then(() => res.json({
+        success: true,
+        message: 'Membership found.',
+        is_member: true,
+      })).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
+    }
+
+    return user.getBoards({
+      where: {
+        board_url: req.query.board_id,
+        is_enabled: true,
+      },
+    }).then((foundBoard) => {
+      if (foundBoard.length >= 1) {
+        return res.json({
           success: true,
           message: 'Membership found.',
           is_member: true,
-        })).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
-      }
-
-      return user.getBoards({
-        where: {
-          board_url: req.body.board_id,
-          is_enabled: true,
-        },
-      }).then((foundBoard) => {
-        if (foundBoard.length >= 1) {
-          return res.json({
-            success: true,
-            message: 'Membership found.',
-            is_member: true,
-          });
-        }
-        return res.json({
-          success: true,
-          message: 'Membership not found.',
-          is_member: false,
         });
-      }).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
-    } catch (err2) {
-      return res.json({ success: false, message: 'Failed to determine membership status.' });
-    }
+      }
+      return res.json({
+        success: true,
+        message: 'Membership not found.',
+        is_member: false,
+      });
+    }).catch(() => res.json({ success: false, message: 'Failed to determine membership status.' }));
   })(req, res, next);
 });
 

@@ -45,8 +45,8 @@ router.post('/register', (req, res) => {
           success: true,
           token: `JWT ${token}`,
           message: 'User successfully created.',
-        }).catch(() => res.json({ success: false, message: 'Email invalid.' }));
-      }));
+        });
+      }).catch(() => res.json({ success: false, message: 'Email invalid.' })));
     });
   });
 });

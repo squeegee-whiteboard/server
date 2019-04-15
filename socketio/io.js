@@ -3,32 +3,96 @@
 /* eslint-disable no-param-reassign */
 const Debug = require('debug');
 const io = require('socket.io')();
+const { Project } = require('paper-jsdom');
+const {
+  getBoardState,
+  setBoardState,
+  newPath,
+  removePaths,
+} = require('./boardTools');
 
 const debug = Debug('server');
-
 
 // Socket whiteboard connections
 // Connect when arriving to the board
 // Disconnect when leaving the dash
 const boardSocket = io.of('/board');
 
-boardSocket.on('connection', (socket) => {
-  debug('connected to board socket');
+// A board state to store the board ID and number of online users for each board currently
+// being accessed
+const boardStates = {};
 
+boardSocket.on('connection', (socket) => {
   // Sets the boardId the user is connected to
   // User will send this immediately upon connection
-  // sets the board id in the socket session
-  // and joins/create a room for that id
   socket.on('boardId', (boardId) => {
+    // Join the socket room for the board
     socket.join(boardId);
+
+    // Set the board ID for the current socket
     socket.boardId = boardId;
-    debug(`Set board id ${socket.boardId}`);
+
+    // Check if the board exists in boardStates already
+    if (boardId in boardStates) {
+      boardStates[boardId].userCount += 1;
+
+      debug(`New user, current board users: ${boardStates[boardId].userCount}`);
+
+      debug(`sending existing board dump ${socket.boardId}`);
+      socket.emit('board_dump', boardStates[boardId].board.exportJSON());
+    } else {
+      // If the board doesn't exist in board states, add it
+      boardStates[boardId] = {
+        userCount: 1,
+        board: new Project(),
+      };
+
+      debug(`new board in mem ${boardId}`);
+
+      getBoardState(boardId).then(
+        (boardState) => {
+          boardStates[boardId].board.importJSON(boardState);
+          debug(`sending newly imported board dump ${socket.boardId}`);
+          socket.emit('board_dump', boardStates[boardId].board.exportJSON());
+        },
+      );
+    }
   });
 
-  // debug, but shows show to emit to everyone in the room
-  socket.on('check', () => {
-    debug(socket.boardId);
-    socket.broadcast.to(socket.boardId).emit('newevent');
+  socket.on('new_path', (pathJSON) => {
+    debug('Got new path');
+    socket.broadcast.to(socket.boardId).emit('new_path', pathJSON);
+
+    const paperObject = boardStates[socket.boardId].board;
+    newPath(paperObject, pathJSON);
+  });
+
+  socket.on('removed_paths', (pathJSONList) => {
+    debug('Got new removed path list');
+    socket.broadcast.to(socket.boardId).emit('removed_paths', pathJSONList);
+
+    const paperObject = boardStates[socket.boardId].board;
+    removePaths(paperObject, pathJSONList);
+  });
+
+  socket.on('disconnect', () => {
+    const { boardId } = socket;
+    debug(`Got disconnect from ${boardId}`);
+    boardStates[boardId].userCount -= 1;
+
+    const newState = boardStates[boardId].board.exportJSON();
+    setBoardState(socket.boardId, newState).then((success) => {
+      if (success) {
+        debug(`successfully saved board state for ${boardId}`);
+      } else {
+        debug(`unsuccessfully saved board state for ${boardId}`);
+      }
+    });
+
+    if (boardStates[boardId].userCount <= 0) {
+      debug(`removing board ${boardId}`);
+      delete boardStates[boardId];
+    }
   });
 });
 

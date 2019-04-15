@@ -1,11 +1,15 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
+const Debug = require('debug');
 
+// eslint-disable-next-line no-unused-vars
+const debug = Debug('db');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 // eslint-disable-next-line import/no-dynamic-require
 const config = require(`${__dirname}/../config/sqlConfig.json`)[env];
+config.logging = debug;
 const db = {};
 
 let sequelize;
