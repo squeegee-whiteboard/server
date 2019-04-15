@@ -88,7 +88,7 @@ router.get('/isMember', (req, res, next) => {
     if (user.is_admin) {
       return Board.findOne({
         where: {
-          board_url: req.body.board_id,
+          board_url: req.query.board_id,
           is_enabled: true,
         },
       }).then(() => res.json({
@@ -100,7 +100,7 @@ router.get('/isMember', (req, res, next) => {
 
     return user.getBoards({
       where: {
-        board_url: req.body.board_id,
+        board_url: req.query.board_id,
         is_enabled: true,
       },
     }).then((foundBoard) => {
