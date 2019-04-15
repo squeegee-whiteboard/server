@@ -110,7 +110,7 @@ dashSocket.on('connection', (socket) => {
   // Sends a refreshBoards event to all users, prompts them to reload their dashboard
   socket.on('change_board', () => {
     debug('change_board');
-    dashSocket.broadcast.emit('refresh_boards');
+    socket.broadcast.emit('refresh_boards');
   });
 });
 
