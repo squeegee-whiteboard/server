@@ -4,7 +4,12 @@
 const Debug = require('debug');
 const io = require('socket.io')();
 const { Project } = require('paper-jsdom');
-const { newPath, removePaths } = require('./boardTools');
+const {
+  getBoardState,
+  setBoardState,
+  newPath,
+  removePaths,
+} = require('./boardTools');
 
 const debug = Debug('server');
 
@@ -31,8 +36,9 @@ boardSocket.on('connection', (socket) => {
     if (boardId in boardStates) {
       boardStates[boardId].userCount += 1;
 
-      debug(`sending existing board dump ${socket.boardId}`);
       debug(`New user, current board users: ${boardStates[boardId].userCount}`);
+
+      debug(`sending existing board dump ${socket.boardId}`);
       socket.emit('board_dump', boardStates[boardId].board.exportJSON());
     } else {
       // If the board doesn't exist in board states, add it
@@ -41,9 +47,15 @@ boardSocket.on('connection', (socket) => {
         board: new Project(),
       };
 
-      debug(`new board ${socket.boardId}`);
+      debug(`new board in mem ${boardId}`);
 
-      // TODO: also load board from DB
+      getBoardState(boardId).then(
+        (boardState) => {
+          boardStates[boardId].board.importJSON(boardState);
+          debug(`sending newly imported board dump ${socket.boardId}`);
+          socket.emit('board_dump', boardStates[boardId].board.exportJSON());
+        },
+      );
     }
   });
 
@@ -64,11 +76,22 @@ boardSocket.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    debug(`Got disconnect from ${socket.boardId}`);
-    boardStates[socket.boardId].userCount -= 1;
+    const { boardId } = socket;
+    debug(`Got disconnect from ${boardId}`);
+    boardStates[boardId].userCount -= 1;
 
-    if (boardStates[socket.boardId].usercount <= 0) {
-      // TODO: save the board and delete the object here
+    const newState = boardStates[boardId].board.exportJSON();
+    setBoardState(socket.boardId, newState).then((success) => {
+      if (success) {
+        debug(`successfully saved board state for ${boardId}`);
+      } else {
+        debug(`unsuccessfully saved board state for ${boardId}`);
+      }
+    });
+
+    if (boardStates[boardId].userCount <= 0) {
+      debug(`removing board ${boardId}`);
+      delete boardStates[boardId];
     }
   });
 });

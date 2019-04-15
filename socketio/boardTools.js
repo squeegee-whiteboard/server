@@ -1,11 +1,9 @@
 // Database tools to allow reads and writes to the board state in the database
 // by the whiteboard socketio rooms
-const Debug = require('debug');
 const { Path } = require('paper-jsdom');
 const models = require('../models');
 
 const { Board } = models;
-const debug = Debug('server');
 
 // Retrieves the board state as a list from the database
 async function getBoardState(boardId) {
