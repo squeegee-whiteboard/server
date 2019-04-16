@@ -85,10 +85,11 @@ router.put('/addMember', (req, res, next) => {
             board_url: req.body.board_id,
             is_enabled: true,
           },
-        }).then(foundBoard => user.addBoard(foundBoard)
-          .then(() => res.json({ success: true, message: 'User added to board.' }))
-          .catch(() => res.json({ success: false, message: 'Failed to add user to board.' })))
-          .catch(() => res.json({ success: false, message: 'Failed to add user to board.' }));
+        }).then((foundBoard) => {
+          if (foundBoard === null) throw new Error('foundBoard is null');
+          return user.addBoard(foundBoard).then(() => res.json({ success: true, message: 'User added to board.' }))
+            .catch(() => res.json({ success: false, message: 'Failed to add user to board.' }));
+        }).catch(() => res.json({ success: false, message: 'Failed to add user to board.' }));
       } catch (err2) {
         return res.json({ success: false, message: 'Failed to add user to board.' });
       }
