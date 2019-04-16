@@ -51,6 +51,10 @@ boardSocket.on('connection', (socket) => {
 
       getBoardState(boardId).then(
         (boardState) => {
+          if (!(boardId in boardStates)) {
+            debug('db_state_callback - board id was undefined');
+            return;
+          }
           boardStates[boardId].board.importJSON(boardState);
           debug(`sending newly imported board dump ${socket.boardId}`);
           socket.emit('board_dump', boardStates[boardId].board.exportJSON());
@@ -60,6 +64,10 @@ boardSocket.on('connection', (socket) => {
   });
 
   socket.on('new_path', (pathJSON) => {
+    if (socket.boardId === undefined) {
+      debug('new_path - socket board id was undefined');
+      return;
+    }
     debug('Got new path');
     socket.broadcast.to(socket.boardId).emit('new_path', pathJSON);
 
@@ -68,6 +76,10 @@ boardSocket.on('connection', (socket) => {
   });
 
   socket.on('removed_paths', (pathJSONList) => {
+    if (socket.boardId === undefined) {
+      debug('removed_paths - socket board id was undefined');
+      return;
+    }
     debug('Got new removed path list');
     socket.broadcast.to(socket.boardId).emit('removed_paths', pathJSONList);
 
@@ -76,6 +88,10 @@ boardSocket.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    if (socket.boardId === undefined) {
+      debug('disconnect - socket board id was undefined');
+      return;
+    }
     const { boardId } = socket;
     debug(`Got disconnect from ${boardId}`);
     boardStates[boardId].userCount -= 1;
