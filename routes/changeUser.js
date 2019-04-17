@@ -79,7 +79,7 @@ router.patch('/email', (req, res, next) => {
           },
         }).then((existingUser) => {
           if (existingUser) {
-            return res.json({ success: false, msg: 'Someone else is using that email!' });
+            return res.json({ success: false, message: 'Someone else is using that email!' });
           }
           return user.update({
             email: req.body.email,
