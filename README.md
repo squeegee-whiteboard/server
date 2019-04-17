@@ -437,15 +437,17 @@ JSON object in the form:
 {
     "success": true,
     "message": <success message>,
-    "board_id": <base64 board identifier string>
+    "board_id": <base64 board identifier string>,
+    "board_preview": <svg text>
 }
 ```
 Ex:
 ```javascript
 {
     "success": true,
-    "message": "Board created."
-    "board_id": "dhohohi32y948234"
+    "message": "Board created.",
+    "board_id": "dhohohi32y948234",
+    "board_preview": "... svg text ...",
 }
 ```
 
@@ -644,6 +646,7 @@ JSON object in the form:
         {
             "board_id": <base64 board identifier string>,
             "board_name": <board name>,
+            "board_preview": <svg text>,
         },
         ...
     ]
@@ -658,10 +661,12 @@ Ex:
         {
             "board_id": "sdaksjka2y92723h2dhui2d",
             "board_name": "AwesomeBoard",
+            "board_preview": "... svg text ...",
         },
         {
             "board_id": "dasdajdajkk28832",
             "board_name": "secondBoard",
+            "board_preview": "... svg text ...",
         }
     ]
 }
@@ -703,6 +708,7 @@ JSON object in the form:
         {
             "board_id": <base64 board identifier string>,
             "board_name": <board name>,
+            "board_preview": <svg text>,
         },
         ...
     ]
@@ -717,14 +723,17 @@ Ex:
        {
             "board_id": "asdsadaaggasdasd",
             "board_name": "AwesomeBoard",
+            "board_preview": "... svg text ...",
         },
         {
             "board_id": "safaf4f28282",
             "board_name": "secondBoard",
+            "board_preview": "... svg text ...",
         },
-	{
+        {
             "board_id": "ferf343364436346",
             "board_name": "Someone Else's Board",
+            "board_preview": "... svg text ...",
         }
     ]
 }

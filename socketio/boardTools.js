@@ -49,6 +49,30 @@ async function setBoardState(boardId, state) {
   return success;
 }
 
+// Writes the given SVG text to the board's board_preview in the database
+async function setBoardPreview(boardId, svg) {
+  let success = false;
+  let board = {};
+
+  try {
+    board = await Board.findOne({
+      where: {
+        board_url: boardId,
+      },
+    });
+
+    await board.update({
+      board_preview: svg,
+    });
+
+    success = true;
+  } catch (error) {
+    success = false;
+  }
+
+  return success;
+}
+
 // Add a new path from the given JSON to a paper project
 function newPath(paperProject, pathJSON) {
   const layer = paperProject.activeLayer;
@@ -119,6 +143,7 @@ function removePaths(paperProject, pathJSONList) {
 module.exports = {
   getBoardState,
   setBoardState,
+  setBoardPreview,
   newPath,
   removePaths,
 };

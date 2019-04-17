@@ -7,6 +7,7 @@ const { Project } = require('paper-jsdom');
 const {
   getBoardState,
   setBoardState,
+  setBoardPreview,
   newPath,
   removePaths,
 } = require('./boardTools');
@@ -97,11 +98,20 @@ boardSocket.on('connection', (socket) => {
     boardStates[boardId].userCount -= 1;
 
     const newState = boardStates[boardId].board.exportJSON();
+    const preview = boardStates[boardId].board.exportSVG({ asString: true, bounds: 'content' });
+    debug(preview);
     setBoardState(socket.boardId, newState).then((success) => {
       if (success) {
         debug(`successfully saved board state for ${boardId}`);
       } else {
         debug(`unsuccessfully saved board state for ${boardId}`);
+      }
+    });
+    setBoardPreview(socket.boardId, preview).then((success) => {
+      if (success) {
+        debug(`successfully saved board preview for ${boardId}`);
+      } else {
+        debug(`unsuccessfully saved board preview for ${boardId}`);
       }
     });
 

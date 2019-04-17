@@ -40,6 +40,11 @@ module.exports = (sequelize, DataTypes) => {
         return b64url;
       },
     },
+    board_preview: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: '<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="500" height="500"/>',
+    },
   }, {});
 
   Board.associate = (models) => {
@@ -61,6 +66,7 @@ module.exports = (sequelize, DataTypes) => {
     const simpleBoard = {
       board_id: this.board_url,
       board_name: this.board_name,
+      board_preview: this.board_preview,
     };
 
     return simpleBoard;
