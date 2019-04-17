@@ -99,7 +99,6 @@ boardSocket.on('connection', (socket) => {
 
     const newState = boardStates[boardId].board.exportJSON();
     const preview = boardStates[boardId].board.exportSVG({ asString: true, bounds: 'content' });
-    debug(preview);
     setBoardState(socket.boardId, newState).then((success) => {
       if (success) {
         debug(`successfully saved board state for ${boardId}`);
