@@ -1,0 +1,23 @@
+[Unit]
+Description=Start the squeegee API server
+# The API server needs network to function
+After=network.target
+
+[Service]
+# Log server messages and set environment to production
+Environment=NODE_ENV='production' DEBUG='server'
+# Make sure we're using the persistent storage
+WorkingDirectory=/mnt/sq_storage/squeegee/server
+ExecStart=/usr/bin/node /mnt/sq_storage/squeegee/server/app.js
+# Restart whenever the server crashes
+Restart=always
+# Wait 30 seconds before restarting the service
+RestartSec=30
+# Log standard error to the systemd journal
+StandardError=journal
+# Mark logs with squeegee-api instead of executed process name
+SyslogIdentifier=squeegee-api
+
+[Install]
+# Start the service when non graphical startup is complete
+WantedBy=multi-user.target
