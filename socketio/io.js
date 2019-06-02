@@ -2,6 +2,7 @@
 
 /* eslint-disable no-param-reassign */
 const Debug = require('debug');
+const { fork } = require('child_process');
 const io = require('socket.io')();
 const { Project } = require('paper-jsdom');
 const {
@@ -22,6 +23,18 @@ const boardSocket = io.of('/board');
 // A board state to store the board ID and number of online users for each board currently
 // being accessed
 const boardStates = {};
+
+// Fork another node process to handle generating the previews as this is CPU intensive
+const svgWorker = fork('svgWorker.js');
+svgWorker.on('message', ({ boardId, preview }) => {
+  setBoardPreview(boardId, preview).then((success) => {
+    if (success) {
+      debug(`successfully saved board preview for ${boardId}`);
+    } else {
+      debug(`Could not save board preview for ${boardId}`);
+    }
+  });
+});
 
 boardSocket.on('connection', (socket) => {
   // Sets the boardId the user is connected to
@@ -98,19 +111,15 @@ boardSocket.on('connection', (socket) => {
     boardStates[boardId].userCount -= 1;
 
     const newState = boardStates[boardId].board.exportJSON();
-    const preview = boardStates[boardId].board.exportSVG({ asString: true, bounds: 'content' });
+
+    // Generate the preview in a worker process
+    svgWorker.send({ boardId, boardJSON: newState });
+
     setBoardState(socket.boardId, newState).then((success) => {
       if (success) {
         debug(`successfully saved board state for ${boardId}`);
       } else {
         debug(`unsuccessfully saved board state for ${boardId}`);
-      }
-    });
-    setBoardPreview(socket.boardId, preview).then((success) => {
-      if (success) {
-        debug(`successfully saved board preview for ${boardId}`);
-      } else {
-        debug(`unsuccessfully saved board preview for ${boardId}`);
       }
     });
 
