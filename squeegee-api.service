@@ -5,7 +5,7 @@ After=network.target
 
 [Service]
 # Log server messages and set environment to production
-Environment=NODE_ENV='production' DEBUG='server'
+Environment=NODE_ENV='production' DEBUG='server,svgworker'
 # Make sure we're using the persistent storage
 WorkingDirectory=/mnt/sq_storage/squeegee/server
 ExecStart=/usr/bin/node /mnt/sq_storage/squeegee/server/app.js
